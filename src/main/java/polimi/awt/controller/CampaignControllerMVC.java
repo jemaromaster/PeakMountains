@@ -3,10 +3,7 @@ package polimi.awt.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import polimi.awt.logic.CampaignLogic;
 import polimi.awt.logic.UserLogic;
 import polimi.awt.model.Campaign;
@@ -15,7 +12,7 @@ import polimi.awt.model.UserPV;
 import java.util.List;
 
 @Controller
-public class DefaultController {
+public class CampaignControllerMVC {
 
     @Autowired
     CampaignLogic campaignLogic;
@@ -23,7 +20,7 @@ public class DefaultController {
     @Autowired
     UserLogic userLogic;
 
-
+    //campaign list
     @GetMapping("/home")
     public String campaigns(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
         List<Campaign> campaignList = campaignLogic.listCampaignByManager("john", 0, 100).getContent();
@@ -31,11 +28,14 @@ public class DefaultController {
         return "/home";
     }
 
-
-    @GetMapping("/admin")
-    public String admin() {
-        return "/admin";
+    //campaign list
+    @GetMapping("/campaignDetails")
+    public String getCampaign(@RequestParam Long campaignId, Model model) {
+        Campaign campaign = campaignLogic.findCampaignById(campaignId);
+        model.addAttribute("campaign", campaign);
+        return "/campaignDetails";
     }
+
 
     @GetMapping("/")
     public String home() {
