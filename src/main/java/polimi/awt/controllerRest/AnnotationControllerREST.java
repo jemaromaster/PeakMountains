@@ -15,7 +15,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("annotations")
-public class AnnotationController {
+public class AnnotationControllerREST {
 
     @Autowired
     AnnotationLogic annotationLogic;

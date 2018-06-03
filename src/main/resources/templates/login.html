@@ -32,12 +32,12 @@
             <section class="login_content">
                 <!--/*@thymesVar id="user" type="polimi.awt.model.UserPV"*/-->
                 <form th:action="@{/login}" th:object="${user}" method="post">
-                    <h1>Login Form</h1>
+                    <h1>Login </h1>
                     <div>
-                        <input type="text" class="form-control" placeholder="Username" th:field="*{username}" />
+                        <input type="text" class="form-control" placeholder="Username" th:field="*{username}"/>
                     </div>
                     <div>
-                        <input type="password" class="form-control" placeholder="Password" th:field="*{password}" />
+                        <input type="password" class="form-control" placeholder="Password" th:field="*{password}"/>
                     </div>
                     <div>
                         <input class="btn btn-default submit" type="submit" value="Log in"/>
@@ -55,7 +55,7 @@
                         <br/>
 
                         <div>
-                            <h1><i class="fa fa-paw"></i> Peak Validation!</h1>
+                            <h1><i class="fa fa-location-arrow"></i> Peak Validation!</h1>
                             <p>©2018 All Rights Reserved.</p>
                         </div>
                     </div>
@@ -65,17 +65,39 @@
 
         <div id="register" class="animate form registration_form">
             <section class="login_content">
-                <form>
-                    <h1>Register To Peak Upload</h1>
+                <form th:action="@{/register}" th:object="${user}" method="post">
+                    <h1>Register</h1>
                     <div>
-                        <input type="text" class="form-control" placeholder="Username" required=""/>
+                        <!--<input type="text" class="form-control" placeholder="Username" required=""/>-->
+                        <input th:field="*{username}" id="name" class="form-control col-md-7 col-xs-12"
+                               data-validate-length-range="6"
+                               data-validate-words="1" name="name" placeholder="Username"
+                               required="required" type="text"/>
                     </div>
                     <div>
-                        <input type="email" class="form-control" placeholder="Email" required=""/>
+                        <!--<input type="email" class="form-control" placeholder="Email" required=""/>-->
+                        <input th:field="*{email}" type="email" placeholder="Email" id="email" name="email"
+                               required="required" class="form-control col-md-7 col-xs-12"/>
                     </div>
                     <div>
-                        <input type="password" class="form-control" placeholder="Password" required=""/>
+                        <input th:field="*{password}" type="password" class="form-control" placeholder="Password"
+                               required="required"/>
                     </div>
+                    <div>
+                        <input type="password" class="form-control" placeholder="Retype password" required="required"/>
+                    </div>
+                    <div id="gender" class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default" data-toggle-class="btn-primary"
+                               data-toggle-passive-class="btn-default">
+                            <input type="radio" th:name="*{'userType'}" value="manager" checked="checked"/> &nbsp;
+                            Manager &nbsp;
+                        </label>
+                        <label class="btn btn-primary" data-toggle-class="btn-primary"
+                               data-toggle-passive-class="btn-default">
+                            <input type="radio" th:name="*{'userType'}" value="worker"/> Worker
+                        </label>
+                    </div>
+
                     <div>
                         <input class="btn btn-default submit" type="submit" value="Submit"/>
                     </div>
@@ -91,9 +113,8 @@
                         <br/>
 
                         <div>
-                            <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
-                            <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and
-                                Terms</p>
+                            <h1><i class="fa fa-location-arrow"></i>Peak Validation</h1>
+                            <p>©2018 All Rights Reserved. </p>
                         </div>
                     </div>
                 </form>
@@ -101,5 +122,20 @@
         </div>
     </div>
 </div>
+<!-- jQuery -->
+<script src="../vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../vendors/nprogress/nprogress.js"></script>
+
+<!-- validator -->
+<script src="../vendors/validator/validator.js"></script>
+
 </body>
 </html>
+
+
+

@@ -10,7 +10,7 @@ import polimi.awt.model.Peak;
 
 @RestController
 @RequestMapping("peaks")
-public class PeakController {
+public class PeakControllerREST {
 
     @Autowired
     PeakLogic peakLogic;

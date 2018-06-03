@@ -15,7 +15,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("users")
-public class UserController {
+public class UserControllerREST {
 
     @Autowired
     UserLogic userLogic;

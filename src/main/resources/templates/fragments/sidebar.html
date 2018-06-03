@@ -21,7 +21,7 @@
 
     <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
         <div class="menu_section">
-            <h3>General</h3>
+            <h3>General Menu</h3>
             <ul class="nav side-menu">
                 <li><a th:href="@{/home}"><i class="fa fa-home"></i> My Campaigns </a>
                 </li>
@@ -29,22 +29,15 @@
                 </li>
                 <li><a><i class="fa fa-bar-chart-o"></i> Statistics </a>
                 </li>
+                <li><a th:href="@{/logout}"><i class="glyphicon glyphicon-off"></i> &nbsp; Logout </a>
+                </li>
             </ul>
         </div>
     </div>
 
     <!-- /menu footer buttons -->
     <div class="sidebar-footer hidden-small">
-        <a data-toggle="tooltip" data-placement="top" title="Settings">
-            <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
-        </a>
-        <a data-toggle="tooltip" data-placement="top" title="FullScreen">
-            <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
-        </a>
-        <a data-toggle="tooltip" data-placement="top" title="Lock">
-            <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
-        </a>
-        <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+        <a data-toggle="tooltip" th:href="@{/logout}" data-placement="top" title="Logout" href="login.html">
             <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
         </a>
     </div>

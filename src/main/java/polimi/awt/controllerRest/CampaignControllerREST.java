@@ -18,7 +18,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("campaigns")
-public class CampaignController {
+public class CampaignControllerREST {
 
     @Autowired
     CampaignLogic campaignLogic;

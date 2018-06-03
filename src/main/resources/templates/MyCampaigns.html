@@ -66,8 +66,10 @@
 
                                 <div class="title_right">
                                     <div class="col-md-5 col-sm-5 col-xs-12 form-group">
-                                        <button type="button" class="btn btn-success btn-sm"><i
-                                                class="fa fa-plus-square-o"></i>New Campaign
+                                        <button type="button" class="btn btn-success btn-sm"
+                                                href="/campaignDetails?campaignId=1"
+                                        ><i
+                                                class="fa fa-plus-square-o"></i>&nbsp;New Campaign
                                         </button>
                                     </div>
                                 </div>
@@ -87,13 +89,13 @@
                                     <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
                                     <tr th:each="camp : ${campaignList}">
                                         <td th:text="${camp.id}">id</td>
-                                        <td th:text="${camp.name}">nanme</td>
+                                        <td th:text="${camp.name}">name</td>
                                         <td th:text="${camp.createdDate}">date</td>
                                         <td th:text="${camp.status}">status</td>
                                         <td>
-                                            <button type="button" class="btn btn-default  btn-xs">Details</button>
-                                            <button type="button" class="btn btn-info btn-xs">Annotations</button>
-                                            <button type="button" class="btn btn-default btn-xs">Statistics</button>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    th:onclick="|window.location.href='@{/campaignDetails(campaignId=${camp.id})}'|"
+                                                    > View campaign</button>
                                         </td>
                                     </tr>
                                     </tbody>

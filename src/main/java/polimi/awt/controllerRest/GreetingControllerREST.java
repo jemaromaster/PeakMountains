@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-public class GreetingController {
+public class GreetingControllerREST {
 
     private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();

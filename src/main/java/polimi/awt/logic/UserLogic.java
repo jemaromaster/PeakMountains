@@ -25,9 +25,25 @@ public class UserLogic {
         Set<Privilege> privilegeList = utils.getPrivileges(newUser.getPrivileges());
         newUser.setPrivileges(privilegeList);
 
+        newUser = this.controlUser(newUser);
         return userRepository.save(newUser);
     }
 
+    private UserPV controlUser(UserPV user){
+        String username = user.getUsername();
+        if (username == null || username.isEmpty()) {
+            throw new RuntimeException("Empty username is not valid");
+        } else {
+            user.setUsername(username.trim());//cut spaces
+        }
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new RuntimeException("Empty email is not valid");
+        } else {
+            user.setEmail(user.getEmail().trim());//cut spaces
+        }
+        return user;
+    }
 
     public UserPV updateUser(String userName, UserPV userToUpdate) {
 
