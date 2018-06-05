@@ -1,0 +1,44 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="messages-body">
+    <div class="x_content bs-example-popovers">
+
+        <div th:if="${message!= null}" class="alert alert-success alert-dismissible fade in" role="alert" >
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">×</span>
+            </button>
+            <strong><span th:text="${message.type}"></span></strong> <span th:text="${message.description}"></span>.
+        </div>
+        <!--<div class="alert alert-info alert-dismissible fade in" role="alert">-->
+            <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span-->
+                    <!--aria-hidden="true">×</span>-->
+            <!--</button>-->
+            <!--<strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.-->
+        <!--</div>-->
+        <!--<div class="alert alert-warning alert-dismissible fade in" role="alert">-->
+            <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span-->
+                    <!--aria-hidden="true">×</span>-->
+            <!--</button>-->
+            <!--<strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.-->
+        <!--</div>-->
+        <!--<div class="alert alert-danger alert-dismissible fade in" role="alert">-->
+            <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span-->
+                    <!--aria-hidden="true">×</span>-->
+            <!--</button>-->
+            <!--<strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.-->
+        <!--</div>-->
+
+    </div>
+
+</div>
+
+<!-- PNotify -->
+<script src="../vendors/pnotify/dist/pnotify.js"></script>
+<script src="../vendors/pnotify/dist/pnotify.buttons.js"></script>
+<script src="../vendors/pnotify/dist/pnotify.nonblock.js"></script>
+
+
+</body>
+</html>

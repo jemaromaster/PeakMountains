@@ -27,9 +27,12 @@
     <a class="hiddenanchor" id="signup"></a>
     <a class="hiddenanchor" id="signin"></a>
 
+    <div th:replace="fragments/messages :: messages-body"/>
+
     <div class="login_wrapper">
         <div class="animate form login_form">
             <section class="login_content">
+
                 <!--/*@thymesVar id="user" type="polimi.awt.model.UserPV"*/-->
                 <form th:action="@{/login}" th:object="${user}" method="post">
                     <h1>Login </h1>
@@ -65,42 +68,49 @@
 
         <div id="register" class="animate form registration_form">
             <section class="login_content">
-                <form th:action="@{/register}" th:object="${user}" method="post">
+                <form th:action="@{/register}" th:object="${user}" method="post" data-parsley-validate="data-parsley-validate">
                     <h1>Register</h1>
-                    <div>
+                    <div class="form-group">
                         <!--<input type="text" class="form-control" placeholder="Username" required=""/>-->
                         <input th:field="*{username}" id="name" class="form-control col-md-7 col-xs-12"
                                data-validate-length-range="6"
                                data-validate-words="1" name="name" placeholder="Username"
                                required="required" type="text"/>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <!--<input type="email" class="form-control" placeholder="Email" required=""/>-->
                         <input th:field="*{email}" type="email" placeholder="Email" id="email" name="email"
                                required="required" class="form-control col-md-7 col-xs-12"/>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <input th:field="*{password}" type="password" class="form-control" placeholder="Password"
                                required="required"/>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <input type="password" class="form-control" placeholder="Retype password" required="required"/>
                     </div>
-                    <div id="gender" class="btn-group" data-toggle="buttons">
-                        <label class="btn btn-default" data-toggle-class="btn-primary"
-                               data-toggle-passive-class="btn-default">
-                            <input type="radio" th:name="*{'userType'}" value="manager" checked="checked"/> &nbsp;
-                            Manager &nbsp;
-                        </label>
-                        <label class="btn btn-primary" data-toggle-class="btn-primary"
-                               data-toggle-passive-class="btn-default">
-                            <input type="radio" th:name="*{'userType'}" value="worker"/> Worker
-                        </label>
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Role type</label>
+                        <div id="gender" class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default" data-toggle-class="btn-primary"
+                                   data-toggle-passive-class="btn-default">
+                                <input type="radio" th:name="*{'userType'}" value="manager" checked="checked"/> &nbsp;
+                                Manager &nbsp;
+                            </label>
+                            <label class="btn btn-primary" data-toggle-class="btn-primary"
+                                   data-toggle-passive-class="btn-default">
+                                <input type="radio" th:name="*{'userType'}" value="worker"/> Worker
+                            </label>
+                        </div>
                     </div>
 
-                    <div>
-                        <input class="btn btn-default submit" type="submit" value="Submit"/>
+                    <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                            <input class="btn btn-default submit" type="submit" value="Submit"/>
+                        </div>
                     </div>
+
 
                     <div class="clearfix"></div>
 
@@ -132,7 +142,10 @@
 <script src="../vendors/nprogress/nprogress.js"></script>
 
 <!-- validator -->
-<script src="../vendors/validator/validator.js"></script>
+<!--<script src="../vendors/validator/validator.js"></script>-->
+
+<!-- Parsley -->
+<script src="../vendors/parsleyjs/dist/parsley.min.js"></script>
 
 </body>
 </html>

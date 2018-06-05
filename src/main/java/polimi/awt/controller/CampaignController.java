@@ -43,11 +43,6 @@ public class CampaignController {
         return "redirect:/home";
     }
 
-    @GetMapping("/about")
-    public String about() {
-        return "/about";
-    }
-
 //    @PostMapping("/login")
 //    public String loginPost(@ModelAttribute(name = "user") UserPV userPV) {
 //        Boolean bool = userLogic.loginUsernamePass(userPV.getUsername(), userPV.getPassword());
@@ -69,6 +64,7 @@ public class CampaignController {
 
     @GetMapping("/403")
     public String error403() {
+
         return "/error/page_403";
     }
 
