@@ -1,9 +1,8 @@
-package polimi.awt.controllerRest;
+package polimi.awt.utils;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import polimi.awt.model.Greeting;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

@@ -1,4 +1,4 @@
-package polimi.awt.model;
+package polimi.awt.utils;
 
 //this is just an example
 public class Greeting {

@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import polimi.awt.model.Greeting;
+import polimi.awt.utils.Greeting;
 
 import java.net.URI;
 

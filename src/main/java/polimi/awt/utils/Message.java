@@ -1,9 +1,14 @@
-package polimi.awt.controller;
+package polimi.awt.utils;
 
 public class Message {
 
     private String type;
     private String description;
+
+    public Message(String type, String description) {
+        this.type = type;
+        this.description = description;
+    }
 
     public String getType() {
         return type;

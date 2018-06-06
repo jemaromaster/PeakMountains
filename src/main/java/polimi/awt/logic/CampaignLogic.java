@@ -57,7 +57,7 @@ public class CampaignLogic {
     //the logic is controlled
     public Campaign createCampaign(Campaign campaign) throws Exception {
 
-        //we get the user from the session
+        //we get the user from the session, which could be only a manager
         UserPV userManager = utils.getUserFromSession();
         Set<Privilege> setP = userManager.getPrivileges();
 

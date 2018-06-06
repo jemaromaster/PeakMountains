@@ -1,6 +1,7 @@
 package polimi.awt;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import polimi.awt.model.Privilege;
@@ -21,8 +22,8 @@ public class Utils {
     private PrivilegeRepository privilegeRepository;
 
     public UserPV getUserFromSession() {
-//        String auth = SecurityContextHolder.getContext().getAuthentication().getName();
-        String auth = "lauri";
+        String auth = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String auth = "lauri";
         UserPV user = userRepository.findByUsername(auth);
         if (user == null) {
             throw new UsernameNotFoundException(auth);
