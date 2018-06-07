@@ -256,6 +256,27 @@ public class CampaignLogic {
         return campaignRepository.save(campaignToStart);
     }
 
+    public Campaign closeCampaign(Long campaignId) {
+
+        //we get the user from the session
+        UserPV user = utils.getUserFromSession();
+
+        Campaign campaignToClose = campaignRepository.findOne(campaignId);
+        if (campaignToClose.getUsrManager().getId() != user.getId()) {
+            throw new RuntimeException("Only the Campaign Manager can close the campaign");
+        }
+
+        if (campaignToClose.getStatus().equals("created")) {
+            throw new RuntimeException("The campaign has not been started yet.");
+        } else if (campaignToClose.getStatus().equals("closed")) {
+            throw new RuntimeException("The campaign has already been closed already");
+        }
+        campaignToClose.setEndDate(new Date());
+        campaignToClose.setStatus("closed");
+
+        return campaignRepository.save(campaignToClose);
+    }
+
     public Campaign suscribeToCampaign(Long campaignId) {
 
         //we get the user from the session

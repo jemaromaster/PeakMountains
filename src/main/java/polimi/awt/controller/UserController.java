@@ -45,8 +45,19 @@ public class UserController {
 
     @GetMapping("/403")
     public String error403() {
-
         return "/error/page_403";
     }
+
+    @PostMapping("/login")
+    public String loginPost(@ModelAttribute(name = "user") UserPV userPV) {
+        Boolean bool = userLogic.loginUsernamePass(userPV.getUsername(), userPV.getPassword());
+
+        if (bool==false) { //if not equals to pass
+            return "redirect:/403";
+        } else {
+            return "redirect:/";
+        }
+    }
+
 
 }

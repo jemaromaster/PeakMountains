@@ -53,17 +53,6 @@ public class CampaignController {
         return "redirect:/home";
     }
 
-//    @PostMapping("/login")
-//    public String loginPost(@ModelAttribute(name = "user") UserPV userPV) {
-//        Boolean bool = userLogic.loginUsernamePass(userPV.getUsername(), userPV.getPassword());
-//
-//        if (bool==false) { //if not equals to pass
-//            return "redirect:/403";
-//        } else {
-//            return "redirect:/";
-//        }
-//    }
-
 
     @GetMapping("/campaign/new")
     public String createCampaign(Model model) {
@@ -134,7 +123,7 @@ public class CampaignController {
     }
 
     @PostMapping(value = "/campaign/{campaignId}/start")
-    public ModelAndView createCampaign(@PathVariable("campaignId") Long campaignId, Model model, RedirectAttributes redir) {
+    public ModelAndView startCampaign(@PathVariable("campaignId") Long campaignId, Model model, RedirectAttributes redir) {
         Message message = null;
         try {
             Campaign campToReturn = campaignLogic.startCampaign(campaignId);
@@ -143,6 +132,26 @@ public class CampaignController {
         } catch (Exception e) {
             e.printStackTrace();
             message = new Message("Warning", "There was a problem starting the campaign with ID=" + campaignId + ".");
+            model.addAttribute("message", message);
+        }
+
+        //in order to redirect to a previous page, and add a message
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/campaign/" + campaignId);
+        redir.addFlashAttribute("message", message);
+        return modelAndView;
+    }
+
+    @PostMapping(value = "/campaign/{campaignId}/close")
+    public ModelAndView closedCampaign(@PathVariable("campaignId") Long campaignId, Model model, RedirectAttributes redir) {
+        Message message = null;
+        try {
+            Campaign campToReturn = campaignLogic.closeCampaign(campaignId);
+            message = new Message("Success", "The campaign " + campToReturn.getName() + " has been closed successfully.");
+            model.addAttribute("message", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = new Message("Warning", "There was a problem closing the campaign with ID=" + campaignId + ".");
             model.addAttribute("message", message);
         }
 
