@@ -148,6 +148,12 @@ public class CampaignLogic {
             throw new RuntimeException("Only the Campaign Manager can update a campaign");
         }
 
+        if (campaignToUploadFile.getStatus().equals("created")) {
+            throw new RuntimeException("The campaign should be in <i>STATUS:STARTED</i> to upload a file. Please start the campaign first.");
+        }else if (!campaignToUploadFile.getStatus().equals("started")) {
+            throw new RuntimeException("The campaign should be in <i>STATUS:STARTED</i> to upload a file.");
+        };
+
         try {
             storageService.store(file, fileName);
         } catch (StorageException e) {

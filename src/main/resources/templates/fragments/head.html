@@ -10,14 +10,18 @@
         <title>PeakVal | </title>
 
         <!-- Bootstrap -->
-        <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+        <link th:href="@{/vendors/bootstrap/dist/css/bootstrap.min.css}"
+              rel="stylesheet"/>
         <!-- Font Awesome -->
-        <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
+        <link th:href="@{/vendors/font-awesome/css/font-awesome.min.css}"
+              rel="stylesheet"/>
         <!-- NProgress -->
-        <link href="../vendors/nprogress/nprogress.css" rel="stylesheet"/>
+        <link th:href="@{/vendors/nprogress/nprogress.css}"
+              rel="stylesheet"/>
 
         <!-- Custom Theme Style -->
-        <link href="../build/css/custom.min.css" rel="stylesheet"/>
+        <link th:href="@{/build/css/custom.min.css}"
+              rel="stylesheet"/>
 
     </div>
 </head>
@@ -59,9 +63,9 @@
 </div>
 
 <!-- PNotify -->
-<script src="../vendors/pnotify/dist/pnotify.js"></script>
-<script src="../vendors/pnotify/dist/pnotify.buttons.js"></script>
-<script src="../vendors/pnotify/dist/pnotify.nonblock.js"></script>
+<script th:src="@{/vendors/pnotify/dist/pnotify.js}"></script>
+<script th:src="@{/vendors/pnotify/dist/pnotify.buttons.js}"></script>
+<script th:src="@{/vendors/pnotify/dist/pnotify.nonblock.js}"></script>
 
 
 </body>

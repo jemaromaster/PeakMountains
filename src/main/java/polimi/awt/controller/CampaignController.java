@@ -3,10 +3,7 @@ package polimi.awt.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -18,6 +15,7 @@ import polimi.awt.model.UserPV;
 import polimi.awt.storage.StorageException;
 import polimi.awt.utils.Message;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -42,8 +40,8 @@ public class CampaignController {
     }
 
     //campaign list
-    @GetMapping("/campaignDetails")
-    public String getCampaigns(@RequestParam Long campaignId, Model model) {
+    @GetMapping("/campaign/{campaignId}")
+    public String getCampaigns(@PathVariable Long campaignId, Model model) {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
         model.addAttribute("campaign", campaign);
         return "/campaignDetails";
@@ -67,14 +65,15 @@ public class CampaignController {
 //    }
 
 
-    @GetMapping("/newCampaign")
+    @GetMapping("/campaign/new")
     public String createCampaign(Model model) {
         model.addAttribute("campaign", new Campaign());
         return "/newCampaign";
     }
 
-    @PostMapping("/newCampaign")
-    public ModelAndView createCampaign(@ModelAttribute(name = "campaign") Campaign campaign, Model model, RedirectAttributes redir) {
+    @PostMapping("/campaign/new")
+    public ModelAndView createCampaign(@ModelAttribute(name = "campaign") Campaign campaign, Model model, RedirectAttributes redir,
+                                       HttpServletRequest httpServletRequest) {
         Message message = null;
         try {
             campaignLogic.createCampaign(campaign);
@@ -88,13 +87,13 @@ public class CampaignController {
 
         //in order to redirect to a previous page, and add a message
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:home");
+        modelAndView.setViewName("redirect:"+ httpServletRequest.getContextPath() + "/home");
         redir.addFlashAttribute("message", message);
         return modelAndView;
     }
 
-    @GetMapping("/uploadPeakFile")
-    public ModelAndView uploadPeakFileView(@RequestParam Long campaignId, Model model, RedirectAttributes redirectAttributes) {
+    @GetMapping("/campaign/{campaignId}/uploadFile")
+    public ModelAndView uploadPeakFileView(@PathVariable(name = "campaignId") Long campaignId, Model model, RedirectAttributes redirectAttributes) {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
         ModelAndView modelAndView = new ModelAndView();
 
@@ -105,20 +104,21 @@ public class CampaignController {
             modelAndView.setViewName("redirect:home");
             return modelAndView;
         }
-        model.addAttribute("campaign", campaign);
+        model.addAttribute(campaign);
+        model.addAttribute("toBeAnnotated", new Boolean(true));
         modelAndView.setViewName("/uploadPeakFile");
 
         return modelAndView;
     }
 
-    @PostMapping("/uploadPeakFile")
-    public ModelAndView handleFilePeakUpload(@ModelAttribute(name = "campaign") Campaign campaign,
+    @PostMapping("/campaign/{campaignId}/uploadFile")
+    public ModelAndView handleFilePeakUpload(@PathVariable(name = "campaignId") Long campaignId,
                                              @RequestParam("file") MultipartFile file,
-                                             @RequestParam("toAnnotate") Boolean toAnnotate,
+                                             @ModelAttribute(name = "toBeAnnotated") Boolean toAnnotate,
                                              RedirectAttributes redirectAttributes) {
         Message message = null;
         try {
-            campaignLogic.StoreAndProcessFile(file, campaign.getId(), toAnnotate);
+            campaignLogic.StoreAndProcessFile(file, campaignId, toAnnotate);
             message = new Message("Success", "You successfully uploaded " + file.getOriginalFilename() + "!");
         } catch (StorageException e) {
             e.printStackTrace();
@@ -127,10 +127,30 @@ public class CampaignController {
 
         //in order to redirect to a previous page, and add a message
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/campaignDetails" + "?campaignId=" + campaign.getId());
+        modelAndView.setViewName("redirect:/campaign/" + campaignId);
         redirectAttributes.addFlashAttribute("message", message);
         return modelAndView;
 
+    }
+
+    @PostMapping(value = "/campaign/{campaignId}/start")
+    public ModelAndView createCampaign(@PathVariable("campaignId") Long campaignId, Model model, RedirectAttributes redir) {
+        Message message = null;
+        try {
+            Campaign campToReturn = campaignLogic.startCampaign(campaignId);
+            message = new Message("Success", "The campaign " + campToReturn.getName() + " has been started successfully.");
+            model.addAttribute("message", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = new Message("Warning", "There was a problem starting the campaign with ID=" + campaignId + ".");
+            model.addAttribute("message", message);
+        }
+
+        //in order to redirect to a previous page, and add a message
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/campaign/" + campaignId);
+        redir.addFlashAttribute("message", message);
+        return modelAndView;
     }
 
 }
