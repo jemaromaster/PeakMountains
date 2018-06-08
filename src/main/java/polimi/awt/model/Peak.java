@@ -2,6 +2,7 @@ package polimi.awt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,27 +13,36 @@ public class Peak {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private long id;
 
+    @Expose
     private Double latitude;
+    @Expose
     private Double longitude;
 
+    @Expose
     private Double altitude;
+    @Expose
     private String name;
 
     @OneToMany(mappedBy = "peak", fetch = FetchType.EAGER)
     private List<AlternativePeakName> localizedNames = new ArrayList<AlternativePeakName>();
 
     @Column(name = "provenance", length = 30)
+    @Expose
     private String provenance;
 
     @Column(nullable = false, columnDefinition = "boolean DEFAULT TRUE")
+    @Expose
     private Boolean toBeAnnotated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Campaign campaign;
 
-//    private String color;
+    @Column(name = "color", length = 10)
+    @Expose
+    private String color;
 
     public long getId() {
         return id;
@@ -108,4 +118,11 @@ public class Peak {
         this.campaign = campaign;
     }
 
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 }

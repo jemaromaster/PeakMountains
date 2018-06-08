@@ -12,7 +12,7 @@ import polimi.awt.repo.AnnotationRepository;
 import polimi.awt.repo.PeakRepository;
 import polimi.awt.repo.UserRepository;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -65,7 +65,7 @@ public class AnnotationLogic {
         }
 
         //create the campaign start date
-        annotation.setDateTimeCreated(Calendar.getInstance());
+        annotation.setDateTimeCreated(new Date());
         annotation.setPeakValidity(true);
         annotation.setPeak(peak);
         annotation.setUserPV(userFromSession);

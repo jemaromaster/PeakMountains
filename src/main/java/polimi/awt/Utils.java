@@ -23,7 +23,7 @@ public class Utils {
 
     public UserPV getUserFromSession() {
         String auth = SecurityContextHolder.getContext().getAuthentication().getName();
-//        String auth = "lauri";
+//        String auth = "w1";
         UserPV user = userRepository.findByUsername(auth);
         if (user == null) {
             throw new UsernameNotFoundException(auth);

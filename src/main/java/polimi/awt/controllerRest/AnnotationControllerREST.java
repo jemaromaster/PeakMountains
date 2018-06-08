@@ -14,7 +14,7 @@ import polimi.awt.model.Annotation;
 import java.net.URI;
 
 @RestController
-@RequestMapping("annotations")
+@RequestMapping("rest/annotations")
 public class AnnotationControllerREST {
 
     @Autowired

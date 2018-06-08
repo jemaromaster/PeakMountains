@@ -149,10 +149,11 @@ public class CampaignLogic {
         }
 
         if (campaignToUploadFile.getStatus().equals("created")) {
-            throw new RuntimeException("The campaign should be in <i>STATUS:STARTED</i> to upload a file. Please start the campaign first.");
-        }else if (!campaignToUploadFile.getStatus().equals("started")) {
-            throw new RuntimeException("The campaign should be in <i>STATUS:STARTED</i> to upload a file.");
-        };
+            throw new RuntimeException("The campaign should be in STATUS:STARTED to upload a file. Please start the campaign first.");
+        } else if (!campaignToUploadFile.getStatus().equals("started")) {
+            throw new RuntimeException("The campaign should be in STATUS:STARTED to upload a file.");
+        }
+        ;
 
         try {
             storageService.store(file, fileName);
@@ -204,6 +205,7 @@ public class CampaignLogic {
             peak.setProvenance(provenance);
             peak.setToBeAnnotated(toAnnotate); //if the peak is to be annotated
             peak.setCampaign(campaign);
+            peak.setColor(toAnnotate ? "yellow" : "green");
 
             // process localized names
             JSONArray localizedNamesJSON = (JSONArray) peakJSON.get("localized_names");
@@ -286,7 +288,7 @@ public class CampaignLogic {
 
         //control if the user is a worker
         if (!user.hasPriviliges("worker")) {
-            throw new RuntimeException("User "+ user.getUsername() + " has no worker rol");
+            throw new RuntimeException("User " + user.getUsername() + " has no worker rol");
         }
 
         //control if the campaign is started

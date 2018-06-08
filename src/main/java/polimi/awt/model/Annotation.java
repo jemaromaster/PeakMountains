@@ -2,10 +2,11 @@ package polimi.awt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -13,22 +14,32 @@ public class Annotation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private long id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Calendar dateTimeCreated;
+    @Expose
+    private Date dateTimeCreated;
 
+    @Expose
     private Boolean peakValidity= Boolean.TRUE;
+
+    @Expose
     private Double elevation;
+
+    @Expose
     private String name;
 
     @Column(name="type", length = 10)
+    @Expose
     private String status = "VALID"; //valid or rejected
 
     @OneToMany(mappedBy = "annotation",fetch = FetchType.EAGER)
+    @Expose
     private List<AlternativePeakAnnotationName> localizedNames = new ArrayList<AlternativePeakAnnotationName>();
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @Expose
     private UserPV userPV;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,11 +56,11 @@ public class Annotation {
         this.id = id;
     }
 
-    public Calendar getDateTimeCreated() {
+    public Date getDateTimeCreated() {
         return dateTimeCreated;
     }
 
-    public void setDateTimeCreated(Calendar dateTimeCreated) {
+    public void setDateTimeCreated(Date dateTimeCreated) {
         this.dateTimeCreated = dateTimeCreated;
     }
 
