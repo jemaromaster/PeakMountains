@@ -116,7 +116,7 @@
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
-                                                               th:value="${peak.toBeAnnotated}"/>
+                                                               th:value="${peak.toBeAnnotated?'Yes':'No'}"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -185,7 +185,7 @@
                                             <th>Id</th>
                                             <th>Name</th>
                                             <th>Elevation</th>
-                                            <th>Valid</th>
+                                            <th>Valid?</th>
                                             <th>Created On</th>
                                             <th>Author</th>
                                             <th>Status</th>
@@ -198,17 +198,30 @@
                                             <td th:text="${camp.id}"></td>
                                             <td th:text="${camp.name}"></td>
                                             <td th:text="${camp.elevation}"></td>
-                                            <td th:text="${camp.peakValidity}"></td>
-                                            <td th:text="${camp.dateTimeCreated}"></td>
+                                            <td th:text="${camp.peakValidity?'Yes':'No'}"></td>
+                                            <td th:text="${#calendars.format(camp.dateTimeCreated,'dd-MM-yyyy')}"></td>
                                             <td th:text="${camp.userPV.username}"></td>
-                                            <td th:text="${camp.status}"></td>
+                                            <td style="background-color:#3dff45" th:if="${camp.status.equals('VALID')}"
+                                                th:text="${camp.status}"></td>
+                                            <td style="background-color:#f44336"
+                                                th:if="${camp.status.equals('REJECTED')}" th:text="${camp.status}"></td>
                                             <td>
-                                                <button type="button" class="btn btn-default btn-xs"
-                                                > View
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-xs"
-                                                > Reject
-                                                </button>
+                                                <!--th:action="@{~/annotations/{annotationId}(annotationId=${camp.id})}"-->
+                                                <!--method="get"-->
+                                                <form>
+                                                    <button type="button" class="btn btn-default btn-xs"
+                                                            data-toggle="modal"
+                                                            data-target="#modalPeakDetails"
+                                                            th:onclick="'getAnnotationDetails(' + ${camp.id} + ');'"
+                                                    >
+                                                        <i class="fa fa-eye"></i> View
+                                                    </button>
+                                                </form>
+
+
+                                                <!--<button type="button" class="btn btn-default btn-xs">-->
+                                                    <!--<i class="fa fa-times"></i> Reject-->
+                                                <!--</button>-->
                                             </td>
                                         </tr>
                                         </tbody>
@@ -221,6 +234,17 @@
             </div>
         </div>
         <!-- /page content -->
+
+
+        <!-- Large modal for rejecting annotation -->
+        <div id="modalPeakDetails" class="modal fade bs-example-modal-lg"
+             tabindex="-1" hidden="false"
+             role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <!--th:action="@{~/annotation/{annotationId}/reject(campaignId=${annotationId.id})}"-->
+                <div id="replaceModalHere"/>
+            </div>
+        </div>
 
         <!-- footer content -->
         <footer>
@@ -332,7 +356,15 @@
     var marker = L.marker([jsonPeak.latitude, jsonPeak.longitude], {icon: hashMapIcons[jsonPeak.color]}).addTo(mymap);
 
     /*]]>*/
+
+    function getAnnotationDetails(peakID) {
+        $.get("/annotations/" + peakID, function (data) {
+            console.log(data);
+            $("#replaceModalHere").html(data);
+        });
+    }
 </script>
+
 
 </body>
 </html>

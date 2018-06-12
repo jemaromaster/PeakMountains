@@ -1,0 +1,112 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="modal-body">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close"
+                    data-dismiss="modal"
+                    aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel2"> Annotation Details</h4>
+        </div>
+
+        <div class="modal-body">
+            <h4><span th:text="${annotationSelected.name}"/></h4>
+            <form class="form-horizontal form-label-left">
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10" th:value="${annotationSelected.name}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Elevation</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10"
+                               th:value="${annotationSelected.elevation + ' meters'}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Created on</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10"
+                               th:value="${#calendars.format(annotationSelected.dateTimeCreated,'dd-MM-yyyy')}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Author</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10"
+                               th:value="${annotationSelected.userPV.username}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Valid
+                        annotation:</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10"
+                               th:value="${annotationSelected.peakValidity?'Yes':'No'}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Status</label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input readonly="readonly" type="text"
+                               class="form-control col-md-10"
+                               th:value="${annotationSelected.status}"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Alternative localized
+                        names:</label>
+                    <div class="col-md-7 col-sm-7 col-xs-12">
+                        <select readonly="true"
+                                class="select2_multiple form-control"
+                                multiple="multiple">
+                            <option th:each="a : ${annotationSelected.localizedNames}"
+                                    th:text="${a.name} + ' [' + ${a.lang} + ']'">id
+                            </option>
+                            <option th:if="${annotationSelected.localizedNames==null}">[None]</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+
+            <form th:action="@{~/annotations/{annId}/reject(annId=${annotationSelected.id})}"
+                  th:if="${annotationSelected.status.equals('VALID')}" method="post">
+                <button type="submit"
+                        class="btn btn-danger btn-sm">
+                    <i class="fa fa-times"></i> Reject Annotation
+                </button>
+                <button type="button" class="btn btn-default btn-sm"
+                        data-dismiss="modal">Cancel
+                </button>
+            </form>
+            <form th:action="@{~/annotations/{annId}/accept(annId=${annotationSelected.id})}"
+                  th:if="${annotationSelected.status.equals('REJECTED')}" method="post">
+                <button type="submit" class="btn btn-success btn-sm"
+                >
+                    <i class="fa fa-check"></i> Accept
+                    Annotation
+                </button>
+                <button type="button" class="btn btn-default btn-sm"
+                        data-dismiss="modal">Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

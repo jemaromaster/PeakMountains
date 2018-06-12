@@ -48,6 +48,7 @@ public class Annotation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Campaign campaign;
 
+
     public long getId() {
         return id;
     }

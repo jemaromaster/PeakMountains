@@ -11,4 +11,5 @@ public interface PeakRepository extends PagingAndSortingRepository<Peak, Long> {
     Page<Peak> findAll(Pageable pageable);
     Peak findPeakByIdEquals(Long id);
     Page<Peak> findPeakByCampaign(Campaign campaign, Pageable pageable);
+    Page<Peak> findPeakByCampaignAndAltitudeIsNotNullOrderByAltitudeDesc(Campaign campaign, Pageable pageable);
 }

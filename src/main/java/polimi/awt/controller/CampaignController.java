@@ -51,7 +51,7 @@ public class CampaignController {
     @GetMapping("/campaign/{campaignId}")
     public String getCampaigns(@PathVariable Long campaignId, Model model) {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
-        Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0,20);
+        Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0,50);
         model.addAttribute("campaign", campaign);
         List<Peak> list = listaPeaks.getContent();
 

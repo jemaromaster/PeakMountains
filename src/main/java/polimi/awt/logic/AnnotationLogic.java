@@ -1,16 +1,15 @@
 package polimi.awt.logic;
 
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import polimi.awt.Utils;
 import polimi.awt.model.*;
-import polimi.awt.repo.AlternativePeakAnnotationNameRepository;
-import polimi.awt.repo.AnnotationRepository;
-import polimi.awt.repo.PeakRepository;
-import polimi.awt.repo.UserRepository;
+import polimi.awt.repo.*;
 
 import java.util.Date;
 import java.util.List;
@@ -24,6 +23,9 @@ public class AnnotationLogic {
 
     @Autowired
     PeakRepository peakRepository;
+
+    @Autowired
+    CampaignRepository campaignRepository;
 
     @Autowired
     Utils utils;
@@ -72,14 +74,88 @@ public class AnnotationLogic {
 
         List<AlternativePeakAnnotationName> list = annotation.getLocalizedNames();
         Annotation annotationToReturn = annotationRepository.save(annotation);
-        if (list!=null){
-            for (AlternativePeakAnnotationName an: list){
+        if (list != null) {
+            for (AlternativePeakAnnotationName an : list) {
                 an.setAnnotation(annotationToReturn);
                 nameForAnnotationRepository.save(an);
             }
         }
         return annotationRepository.save(annotation);
 
+    }
+
+    @Transactional
+    public Annotation rejectAnnotation(Long annotationId) {
+        //we get the user from the session
+        UserPV user = utils.getUserFromSession();
+
+        Annotation annotationToReject = annotationRepository.findOne(annotationId);
+        Hibernate.initialize(annotationToReject.getPeak());
+
+        Peak peak = utils.initializeAndUnproxy(annotationToReject.getPeak());
+
+        Campaign camp = utils.initializeAndUnproxy(peak.getCampaign());
+
+        if (camp.getUsrManager().getId() != user.getId()) {
+            throw new RuntimeException("Only the Campaign Manager can reject an annotation");
+        }
+
+        if (annotationToReject.getStatus().equals("REJECTED")) {
+            throw new RuntimeException("The annotation has already been rejected");
+        }
+
+        annotationToReject.setStatus("REJECTED");
+
+        if (peak.getColor().equals("orange")) {
+            peak.setColor("red");
+        }
+        peakRepository.save(peak);
+        return annotationRepository.save(annotationToReject);
+    }
+
+    @Transactional
+    public Annotation acceptAnnotation(Long annotationId) {
+        //we get the user from the session
+        UserPV user = utils.getUserFromSession();
+
+        Annotation annotationToReject = annotationRepository.findOne(annotationId);
+        Hibernate.initialize(annotationToReject.getPeak());
+
+        Peak peak = utils.initializeAndUnproxy(annotationToReject.getPeak());
+
+        Campaign camp = utils.initializeAndUnproxy(peak.getCampaign());
+
+        if (camp.getUsrManager().getId() != user.getId()) {
+            throw new RuntimeException("Only the Campaign Manager can reaccept an annotation");
+        }
+
+        if (annotationToReject.getStatus().equals("VALID")) {
+            throw new RuntimeException("The annotation has already been reaccepted");
+        }
+
+        annotationToReject.setStatus("VALID");
+
+        Long qAnnotation=null;
+        Long qAnnotationRejected = null;
+        //maintain color
+        if (peak.getToBeAnnotated()==false){
+            peak.setColor("green");
+        }else{ //the peak is to be annotated. It could be yellow, orange or red
+            qAnnotation = annotationRepository.countAnnotationByPeak(peak);
+            qAnnotationRejected = annotationRepository.countAnnotationByPeakAndStatusEquals(peak, "REJECTED");
+            if(qAnnotation==0l){
+                peak.setColor("yellow");
+            }else{
+                if (qAnnotationRejected==0l){
+                    peak.setColor("orange");
+                }else{
+                    peak.setColor("red");
+                }
+            }
+        }
+
+        peakRepository.save(peak);
+        return annotationRepository.save(annotationToReject);
     }
 
     public Page<Annotation> findAll(Integer page, Integer size) {
@@ -92,7 +168,7 @@ public class AnnotationLogic {
         if (peak == null) {
             throw new RuntimeException("Peak id " + peakId + " is not valid");
         }
-        return  annotationRepository.findAnnotationByPeak(peak, new PageRequest(page, size));
+        return annotationRepository.findAnnotationByPeak(peak, new PageRequest(page, size));
     }
 
     public Annotation findAnnotationById(Long findById) {

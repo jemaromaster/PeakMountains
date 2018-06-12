@@ -39,14 +39,15 @@ public class PeakController {
     public String getCampaigns(@PathVariable Long peakId, Model model) {
         Peak peak = peakLogic.findPeakById(peakId);
         Page<Annotation> annotations = annotationLogic.findAnnotationByPeak(peakId, 0, 100);
-//        Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0,20);
+
         model.addAttribute("peak", peak);
         model.addAttribute("annotations", annotations.getContent());
-//        List<Peak> list = listaPeaks.getContent();
+        model.addAttribute("annotationSelected", null);
+
+        //we first serialize the peak to a JSON
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String peakJson = gson.toJson(peak);
         model.addAttribute("peakJson", peakJson);
-//        model.addAttribute("listaPeaks", jsonList);
         return "/peakDetails";
     }
 

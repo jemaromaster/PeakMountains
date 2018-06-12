@@ -10,4 +10,8 @@ public interface AnnotationRepository extends PagingAndSortingRepository<Annotat
     Page<Annotation> findAll(Pageable pageable);
     Annotation findAnnotationById(Long id);
     Page<Annotation> findAnnotationByPeak(Peak peak, Pageable pageable);
+
+    Long countAnnotationByPeakAndStatusEquals(Peak peak, String status);
+    Long countAnnotationByPeak(Peak peak);
+
 }

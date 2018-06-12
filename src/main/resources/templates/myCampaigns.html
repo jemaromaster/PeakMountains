@@ -86,7 +86,7 @@
                                     <tr th:each="camp : ${campaignList}">
                                         <td th:text="${camp.id}">id</td>
                                         <td th:text="${camp.name}">name</td>
-                                        <td th:text="${camp.createdDate}">date</td>
+                                        <td th:text="${#calendars.format(camp.createdDate,'dd-MM-yyyy')}">date</td>
                                         <td th:text="${camp.status}">status</td>
                                         <td>
                                             <button type="button" class="btn btn-default btn-xs"

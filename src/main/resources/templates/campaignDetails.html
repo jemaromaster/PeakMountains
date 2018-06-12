@@ -154,7 +154,6 @@
 
 
                                         <!-- /modals -->
-
                                         <div class="col-md-12 col-sm-12 col-xs-12 form-group">
                                             <button type="button" class="btn btn-default btn-sm"
                                                     th:disabled="${campaign.status=='created'}"><i
@@ -170,7 +169,7 @@
 
                                     </div>
 
-                                    <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1 col-xs-12 form-group">
+                                    <div class="col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 form-group">
 
                                         <div id="mapid" style="height: 400px"></div>
 
@@ -234,15 +233,6 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var mymap = L.map('mapid').setView([47.27008300000001, 13.821603800000002], 13);
-
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        id: 'mapbox.streets',
-        accessToken: 'pk.eyJ1IjoiamVtYXJvbWFzdGVyIiwiYSI6ImNqaTR2eTRicTBkbXMzdm1ybzhsaHRzZmEifQ.3YESvQQqShg6m3aChbndkQ'
-    }).addTo(mymap);
-
     //this comment is for thymleaf to know where to inject the data
     /*[+
     var peaksString = [[${listaPeaks}]];
@@ -292,6 +282,16 @@
     hashMapIcons['orange'] = orangeIcon;
 
     peaks = JSON.parse(peaksString);
+
+    var mymap = L.map('mapid').setView([peaks[0].latitude, peaks[0].longitude], 13);
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoiamVtYXJvbWFzdGVyIiwiYSI6ImNqaTR2eTRicTBkbXMzdm1ybzhsaHRzZmEifQ.3YESvQQqShg6m3aChbndkQ'
+    }).addTo(mymap);
+
     for (var i = 0; i < peaks.length; i++) {
         var marker = L.marker([peaks[i].latitude, peaks[i].longitude], {icon: hashMapIcons[peaks[i].color]}).addTo(mymap);
         marker.bindPopup("<b>" + peaks[i].name + "</b><br></br>Altitude: " + peaks[i].altitude + " m" + "<br></br>" +

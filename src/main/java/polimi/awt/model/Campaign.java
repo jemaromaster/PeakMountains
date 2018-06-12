@@ -1,7 +1,12 @@
 package polimi.awt.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,8 +33,8 @@ public class Campaign {
             cascade =  CascadeType.ALL)
     private UserPV usrManager;
 
-//    @OneToMany(mappedBy = "campaign")
-//    private List<Peak> peaksInCampaign = new ArrayList<Peak>();
+    @OneToMany(mappedBy = "campaign")
+    private List<Peak> peaksInCampaign = new ArrayList<Peak>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name="workers_campaigns",
@@ -94,15 +99,15 @@ public class Campaign {
         this.createdDate = createdDate;
     }
 
-//    @JsonIgnore
-//    public List<Peak> getPeaksInCampaign() {
-//        return peaksInCampaign;
-//    }
+    @JsonIgnore
+    public List<Peak> getPeaksInCampaign() {
+        return peaksInCampaign;
+    }
 
-//    @JsonProperty
-//    public void setPeaksInCampaign(List<Peak> peaksInCampaign) {
-//        this.peaksInCampaign = peaksInCampaign;
-//    }
+    @JsonProperty
+    public void setPeaksInCampaign(List<Peak> peaksInCampaign) {
+        this.peaksInCampaign = peaksInCampaign;
+    }
 
     public Set<UserPV> getWorkersJoined() {
         return workersJoined;

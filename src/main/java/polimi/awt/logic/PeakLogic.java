@@ -31,7 +31,7 @@ public class PeakLogic {
         if (campaign==null){
             throw new RuntimeException("Campaign " + campaignId + " not found");
         }
-        return peakRepository.findPeakByCampaign(campaign, new PageRequest(page, size));
+        return peakRepository.findPeakByCampaignAndAltitudeIsNotNullOrderByAltitudeDesc(campaign, new PageRequest(page, size));
     }
 
     public Peak findPeakById(Long findById) {
