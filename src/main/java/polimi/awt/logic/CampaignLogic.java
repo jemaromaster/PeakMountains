@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import polimi.awt.Utils;
 import polimi.awt.model.*;
@@ -20,16 +20,18 @@ import polimi.awt.repo.PeakRepository;
 import polimi.awt.repo.UserRepository;
 import polimi.awt.storage.StorageException;
 import polimi.awt.storage.StorageService;
+import polimi.awt.utils.Statistics;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@Component
+@Service
 public class CampaignLogic {
 
     @Autowired
@@ -300,6 +302,32 @@ public class CampaignLogic {
         campaignRepository.save(campaignToSuscribe);
 
         return campaignToSuscribe;
+    }
+
+    public Statistics getStatistics(Campaign campaign) {
+        //we get the user from the session
+        Statistics stat = new Statistics();
+
+        //total peaks
+        Long totalPeaks = peakRepository.countPeakByCampaign(campaign);
+        stat.setTotalPeaks(new BigDecimal(totalPeaks));
+
+        //total peaks yellow
+        Long peaksStarted = peakRepository.countPeakByCampaignAndColorLike(campaign, "yellow");
+        stat.setPeaksStarted(new BigDecimal(peaksStarted));
+
+        //total peaks red
+        Long peaksReject = peakRepository.countPeakByCampaignAndColorLike(campaign, "red");
+        stat.setPeaksWithRejectedAnnotation(new BigDecimal(peaksReject));
+
+        //total peaks orange
+        Long peaksAnnotated = peakRepository.countPeakByCampaignAndColorLike(campaign, "orange");
+        stat.setPeaksAnnotated(new BigDecimal(peaksAnnotated + peaksReject));
+
+        //total number of conflicts
+        //define number of conflicts
+
+        return stat;
     }
 
 }

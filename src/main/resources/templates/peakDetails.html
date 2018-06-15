@@ -54,7 +54,9 @@
                         <div class="x_panel">
                             <div class="x_title">
                                 <h2><!--/*@thymesVar id="peak" type="polimi.awt.model.Peak"*/-->
-                                    <p th:text="'Peak Details: ' + ${peak.campaign.name} + ' > ' + ${peak.name} "/>
+                                    <p><a th:href="@{~/campaign/{campId}(campId=${peak.campaign.id})}"
+                                          th:text="${peak.campaign.name} + ' > ' + ${peak.name} "/>
+                                    </p>
                                     <i><span th:text="'Status: ' + ${peak.color} "/></i>
                                 </h2>
                                 <ul class="nav navbar-right panel_toolbox">
@@ -149,7 +151,7 @@
 
                                     <div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-12 form-group">
 
-                                        <div id="mapid" style="height: 300px"></div>
+                                            <div id="mapid" style="height: 300px"></div>
 
                                     </div>
 
@@ -220,7 +222,7 @@
 
 
                                                 <!--<button type="button" class="btn btn-default btn-xs">-->
-                                                    <!--<i class="fa fa-times"></i> Reject-->
+                                                <!--<i class="fa fa-times"></i> Reject-->
                                                 <!--</button>-->
                                             </td>
                                         </tr>

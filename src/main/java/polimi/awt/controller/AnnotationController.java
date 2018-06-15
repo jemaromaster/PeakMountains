@@ -43,7 +43,6 @@ public class AnnotationController {
         return "/fragments/modalRejectPeak :: modal-body";
     }
 
-    //annotation details
     @PostMapping("/annotations/{annotationId}/reject")
     public ModelAndView rejectAnnotation(@PathVariable Long annotationId, Model model, RedirectAttributes redir) {
 
@@ -52,7 +51,7 @@ public class AnnotationController {
         Annotation ann = annotationLogic.findAnnotationById(annotationId);
         modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
         try {
-            //reject annotation here
+            //reject annotation
             annotationLogic.rejectAnnotation(annotationId);
             message = new Message("Success", "The annotation has been rejected successfully.");
             model.addAttribute("message", message);
@@ -76,7 +75,7 @@ public class AnnotationController {
         Annotation ann = annotationLogic.findAnnotationById(annotationId);
         modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
         try {
-            //accept annotation here
+            //accept annotation
             annotationLogic.acceptAnnotation(annotationId);
             message = new Message("Success", "The annotation has been accepted successfully.");
             model.addAttribute("message", message);

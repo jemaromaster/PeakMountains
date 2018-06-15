@@ -19,6 +19,7 @@ import polimi.awt.model.Peak;
 import polimi.awt.model.UserPV;
 import polimi.awt.storage.StorageException;
 import polimi.awt.utils.Message;
+import polimi.awt.utils.Statistics;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CampaignController {
     @GetMapping("/campaign/{campaignId}")
     public String getCampaigns(@PathVariable Long campaignId, Model model) {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
-        Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0,50);
+        Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0, 50);
         model.addAttribute("campaign", campaign);
         List<Peak> list = listaPeaks.getContent();
 
@@ -91,7 +92,7 @@ public class CampaignController {
 
         //in order to redirect to a previous page, and add a message
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:"+ httpServletRequest.getContextPath() + "/home");
+        modelAndView.setViewName("redirect:" + httpServletRequest.getContextPath() + "/home");
         redir.addFlashAttribute("message", message);
         return modelAndView;
     }
@@ -115,6 +116,27 @@ public class CampaignController {
         return modelAndView;
     }
 
+    @GetMapping("/campaign/{campaignId}/statistics")
+    public ModelAndView viewPeakStatistics(@PathVariable(name = "campaignId") Long campaignId, Model model, RedirectAttributes redirectAttributes) {
+        Campaign campaign = campaignLogic.findCampaignById(campaignId);
+        ModelAndView modelAndView = new ModelAndView();
+
+        //in case that the user is trying to access the url without the manager privilege over his campaign
+        UserPV userInSession = utils.getUserFromSession();
+        if (campaign.getUsrManager().getId() != userInSession.getId()) {
+            redirectAttributes.addFlashAttribute("message", new Message("warning", "Only the campaign manager can upload files into the campaign"));
+            modelAndView.setViewName("redirect:home");
+            return modelAndView;
+        }
+
+        Statistics stat = campaignLogic.getStatistics(campaign);
+        model.addAttribute(campaign);
+        model.addAttribute("statistics", stat);
+        modelAndView.setViewName("/campaignStatistics");
+
+        return modelAndView;
+    }
+
     @PostMapping("/campaign/{campaignId}/uploadFile")
     public ModelAndView handleFilePeakUpload(@PathVariable(name = "campaignId") Long campaignId,
                                              @RequestParam("file") MultipartFile file,
@@ -127,7 +149,7 @@ public class CampaignController {
         } catch (StorageException e) {
             e.printStackTrace();
             message = new Message("Error", "Error upload file. " + e.getMessage());
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             e.printStackTrace();
             message = new Message("Error", "Error uploading file. " + e.getMessage());
         }

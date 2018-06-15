@@ -42,7 +42,7 @@
                 <div class="page-title">
                     <div class="title_left">
                         <!--/*@thymesVar id="campaign" type="polimi.awt.model.Campaign"*/-->
-                        <h3>Campaign Details</h3>
+                        <h3>Campaign Statistics</h3>
                     </div>
 
                     <!--<div hidden="true" th:replace="fragments/searchFor :: search-field"/>-->
@@ -152,32 +152,35 @@
                                             </div>
                                         </div>
                                         <!-- /modals -->
-                                        <div class="col-md-12 col-sm-12 col-xs-12 form-group">
-                                            <button type="button" class="btn btn-default btn-sm"
-                                                    th:disabled="${campaign.status=='created'}"
-                                                    th:onclick="|window.location.href='@{/campaign/{campaignId}/statistics(campaignId=${campaign.id})}'|"
-                                            ><i
-                                                    class="fa fa-line-chart"></i>&nbsp;Statistics
-                                            </button>
-
-                                            <button type="button" class="btn btn-default btn-sm"
-                                                    th:disabled="${campaign.status=='created' or campaign.status=='closed'}"
-                                                    th:onclick="|window.location.href='@{/campaign/{campaignId}/uploadFile(campaignId=${campaign.id})}'|"
-                                            ><i class="fa fa-upload"></i>&nbsp;Upload File
-                                            </button>
-                                        </div>
-
                                     </div>
 
                                     <div class="col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 form-group">
-                                        <div th:if="${campaign.status=='created'}" class="alert alert-info alert-dismissible fade in" role="alert">
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                                                    aria-hidden="true">×</span>
-                                            </button>
-                                            <strong><span th:text="${'Attention.'}"></span></strong> <span th:text="${'The campaign does not count with any peak information yet. To start uploading peaks, you should start the campaign first.'}"></span>
+
+                                        <div class="row tile_count">
+                                            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                                                <span class="count_top"><i class="fa fa-area-chart"></i> Total Peaks</span>
+                                                <div class="count"><p th:text="${statistics.totalPeaks}"/></div>
+                                            </div>
+                                            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                                                <span class="count_top"><i class="fa fa-user"></i> Peaks Started</span>
+                                                <div class="count"><p th:text="${statistics.peaksStarted}"/></div>
+                                                <span class="count_bottom"><i class="green"><span th:text="${statistics.peaksStartedPercentage}"/> </i> from Total</span>
+                                            </div>
+                                            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                                                <span class="count_top"><i class="fa fa-clock-o"></i> Peaks Annotated</span>
+                                                <div class="count green"><p th:text="${statistics.peaksAnnotated}"/></div>
+                                                <span class="count_bottom"> <span th:text="${statistics.peaksAnnotatedPercentage} + '%'"/></span>
+                                            </div>
+                                            <div class="col-md-3 col-sm-5 col-xs-6 tile_stats_count">
+                                                <span class="count_top"><i class="fa fa-user"></i> Peaks w/ Rejected Annotations</span>
+                                                <div class="count red"><p th:text="${statistics.peaksWithRejectedAnnotation}"/></div>
+                                                <span class="count_bottom"><i class="red"><span th:text="${statistics.peaksWithRejectedAnnotationPercentage} + '%'"/> </i> from Total</span>
+                                            </div>
+                                            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+                                                <span class="count_top"><i class="fa fa-user"></i> Conflicts</span>
+                                                <div class="count"><p th:text="${statistics.conflicts}"/></div>
+                                            </div>
                                         </div>
-                                        <div id="mapid" style="height: 400px"></div>
-                                        <span th:if="${campaign.status!='created'}">* The map first view is centered over the highest peak in the campaign.</span>
                                     </div>
 
                                 </div>

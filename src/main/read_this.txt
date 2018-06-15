@@ -1,0 +1,17 @@
+When creating the WORKER use case:
+- mantain the annotation number columns in the Peak entity: anytime that there's a new annotation, a conflict should be check,
+  update the peak validity counters.
+
+Still lacking:
+- MAP 3D.
+- Worker use cases:
+    - suscribe to campaigns.
+    - list campaign.
+    - create annotation in peaks.
+- Profile for modifying user information.
+
+If we have time:
+- pagination in tables.
+- set specific messages to forms.
+- pagination in map.
+

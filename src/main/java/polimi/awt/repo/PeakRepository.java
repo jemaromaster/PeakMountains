@@ -12,4 +12,7 @@ public interface PeakRepository extends PagingAndSortingRepository<Peak, Long> {
     Peak findPeakByIdEquals(Long id);
     Page<Peak> findPeakByCampaign(Campaign campaign, Pageable pageable);
     Page<Peak> findPeakByCampaignAndAltitudeIsNotNullOrderByAltitudeDesc(Campaign campaign, Pageable pageable);
+    Long countPeakByCampaign(Campaign campaign);
+    Long countPeakByCampaignAndColorLike(Campaign campaign, String color);
+    Long countPeakByCampaignAndColor(Campaign campaign, String color);
 }

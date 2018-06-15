@@ -3,14 +3,15 @@ package polimi.awt.logic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import polimi.awt.Utils;
 import polimi.awt.model.Campaign;
 import polimi.awt.model.Peak;
 import polimi.awt.repo.CampaignRepository;
 import polimi.awt.repo.PeakRepository;
 import polimi.awt.repo.UserRepository;
 
-@Component
+@Service
 public class PeakLogic {
 
     @Autowired
@@ -21,6 +22,9 @@ public class PeakLogic {
 
     @Autowired
     CampaignRepository campaignRepository;
+
+    @Autowired
+    Utils utils;
 
     public Page<Peak> findAll(Integer page, Integer size) {
         return peakRepository.findAll(new PageRequest(page, size));
@@ -36,7 +40,8 @@ public class PeakLogic {
 
     public Peak findPeakById(Long findById) {
         //we get the user from the session
-        return peakRepository.findPeakByIdEquals(findById);
+        Peak peak = peakRepository.findPeakByIdEquals(findById);
+        return peak;
     }
 
 

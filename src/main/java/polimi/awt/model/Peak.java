@@ -44,6 +44,19 @@ public class Peak {
     @Expose
     private String color;
 
+    @Column
+    @Expose
+    private Long positivePeaksValidity=0l;
+
+    @Column
+    @Expose
+    private Long negativePeaksValidity=0l;
+
+    @Column
+    @Expose
+    private Boolean conflicts=false;
+
+
     public long getId() {
         return id;
     }
@@ -124,5 +137,29 @@ public class Peak {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Long getPositivePeaksValidity() {
+        return positivePeaksValidity;
+    }
+
+    public void setPositivePeaksValidity(Long positivePeaksValidity) {
+        this.positivePeaksValidity = positivePeaksValidity;
+    }
+
+    public Long getNegativePeaksValidity() {
+        return negativePeaksValidity;
+    }
+
+    public void setNegativePeaksValidity(Long negativePeaksValidity) {
+        this.negativePeaksValidity = negativePeaksValidity;
+    }
+
+    public Boolean getConflicts() {
+        return conflicts;
+    }
+
+    public void setConflicts(Boolean conflicts) {
+        this.conflicts = conflicts;
     }
 }
