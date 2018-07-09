@@ -2,7 +2,6 @@ package polimi.awt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -55,10 +54,7 @@ public class UserPV {
 
     @JsonProperty
     public void setPassword(String password){
-        //we encrypt the password
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
-        String encodedPass = encoder.encode(password);
-        this.password = encodedPass;
+        this.password = password;
     }
 
     public String getEmail() {
