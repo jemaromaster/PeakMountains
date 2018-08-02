@@ -16,9 +16,21 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
           integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
           crossorigin=""/>
+
+    <style>
+        @import url(../build/cesium/Widgets/widgets.css);
+        html, body, #cesiumContainer {
+            width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+        }
+    </style>
 </head>
 
 <body class="nav-md">
+
+<script>
+    var showMap3d=false;
+
+</script>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">
@@ -114,44 +126,46 @@
                                 <div class="clearfix"></div>
                             </div>
 
+                            <!-- Small modal for starting campaign -->
+                            <div id="modalStartCampaign" class="modal fade bs-example-modal-sm"
+                                 tabindex="-1" hidden="false"
+                                 role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <form th:action="@{~/campaign/{campaignId}/start(campaignId=${campaign.id})}"
+                                          method="post">
+
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close"><span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel2">Start
+                                                    campaign</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h4>Are you sure do you want to start the campaign <span
+                                                        th:text="${campaign.name} "/>?</h4>
+                                                <p>After the campaign is started, you will be able to upload
+                                                    peak files.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-sm"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                <button type="submit" class="btn btn-success btn-sm">Start
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- /modals -->
+
                             <div class="x_content">
                                 <div class="title_right">
                                     <div class="col-md-10 col-sm-10 col-xs-12 form-group">
-                                        <!-- Small modal for starting campaign -->
-                                        <div id="modalStartCampaign" class="modal fade bs-example-modal-sm"
-                                             tabindex="-1" hidden="false"
-                                             role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog modal-sm">
-                                                <form th:action="@{~/campaign/{campaignId}/start(campaignId=${campaign.id})}"
-                                                      method="post">
 
-                                                    <div class="modal-content">
-
-                                                        <div class="modal-header">
-                                                            <button type="button" class="close" data-dismiss="modal"
-                                                                    aria-label="Close"><span aria-hidden="true">×</span>
-                                                            </button>
-                                                            <h4 class="modal-title" id="myModalLabel2">Start
-                                                                campaign</h4>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <h4>Are you sure do you want to start the campaign <span
-                                                                    th:text="${campaign.name} "/>?</h4>
-                                                            <p>After the campaign is started, you will be able to upload
-                                                                peak files.</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-default btn-sm"
-                                                                    data-dismiss="modal">Cancel
-                                                            </button>
-                                                            <button type="submit" class="btn btn-success btn-sm">Start
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                        <!-- /modals -->
                                         <div class="col-md-12 col-sm-12 col-xs-12 form-group">
                                             <button type="button" class="btn btn-default btn-sm"
                                                     th:disabled="${campaign.status=='created'}"
@@ -165,18 +179,40 @@
                                                     th:onclick="|window.location.href='@{/campaign/{campaignId}/uploadFile(campaignId=${campaign.id})}'|"
                                             ><i class="fa fa-upload"></i>&nbsp;Upload File
                                             </button>
+
                                         </div>
 
                                     </div>
 
                                     <div class="col-md-12 col-md-offset-0 col-sm-12 col-sm-offset-0 col-xs-12 form-group">
+
                                         <div th:if="${campaign.status=='created'}" class="alert alert-info alert-dismissible fade in" role="alert">
                                             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                                                     aria-hidden="true">×</span>
                                             </button>
                                             <strong><span th:text="${'Attention.'}"></span></strong> <span th:text="${'The campaign does not count with any peak information yet. To start uploading peaks, you should start the campaign first.'}"></span>
                                         </div>
-                                        <div id="mapid" style="height: 400px"></div>
+
+                                        <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                            <ul id="myTab1" class="nav nav-tabs bar_tabs right" role="tablist">
+                                                <li role="presentation" class="active"><a href="#tab_content11" id="home-tabb" role="tab" data-toggle="tab" aria-controls="home" aria-expanded="true">2D Map</a>
+                                                </li>
+                                                <li role="presentation" class=""><a href="#tab_content22" role="tab" id="profile-tabb" data-toggle="tab" aria-controls="profile" aria-expanded="false">3D Map</a>
+                                                </li>
+                                            </ul>
+
+
+                                            <div id="myTabContent2" class="tab-content">
+                                                <div role="tabpanel" class="tab-pane fade active in" id="tab_content11" aria-labelledby="home-tab">
+                                                    <div id="mapid" style="height: 400px"></div>
+                                                </div>
+                                                <div role="tabpanel" class="tab-pane fade" id="tab_content22" aria-labelledby="profile-tab">
+                                                    <div id="cesiumContainer" style="height: 400px"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
                                         <span th:if="${campaign.status!='created'}">* The map first view is centered over the highest peak in the campaign.</span>
                                     </div>
 
@@ -231,6 +267,7 @@
 <!-- Custom Theme Scripts -->
 <script src="../build/js/custom.min.js"></script>
 
+<script src="../build/cesium/Cesium.js"></script>
 <!-- leaflet map 2d -->
 <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
         integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
@@ -244,6 +281,7 @@
      +]*/
     var marker;
 
+    //MAP 2D configurations
     //define the icon colors
     var greenIcon = new L.Icon({
         iconUrl: '../images/marker-icon-2x-green.png',
@@ -306,6 +344,34 @@
     }
 
     /*]]>*/
+
+    //MAP 3D configurations
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMGZkYTg4MC04NDJjLTQzNmMtYTE1NC1kM2FkMTQwOTVjOTgiLCJpZCI6MjQzOSwiaWF0IjoxNTMzMjI3MTgxfQ.QtcIH_OhAiRo5eXT2zyNjNXCiYurffe4yP7l1o3ZkpI';
+
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        terrainExaggeration : 2.0, // use the Bing Maps Aerial imagery from ion (this is the default)
+        terrainProvider: Cesium.createWorldTerrain() // use the Cesium World Terrain from ion
+    });
+
+    // viewer.camera.setView({
+    //     destination : new Cesium.Cartesian3(-2696570.092794883, -4276051.411224011, 3887257.288168422),
+    //     orientation : {
+    //         heading : 5.193128432412409,
+    //         pitch : -0.3996479673257727
+    //     }
+    // });
+    // var target = new Cesium.Cartesian3(-2708814.85583248, -4254159.450845907, 3891403.9457429945);
+    // var offset = new Cesium.Cartesian3(70642.66030209465, -31661.517948317807, 35505.179997143336);
+    // viewer.camera.lookAt(target, offset);
+    // viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+
+    viewer.camera.setView({
+        destination : new Cesium.Cartesian3(277096.634865404, 5647834.481964232, 2985563.7039122293),
+        orientation : {
+            heading : 4.731089976107251,
+            pitch : -0.32003481981370063
+        }
+    });
 </script>
 
 </body>
