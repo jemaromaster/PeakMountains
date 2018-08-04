@@ -121,7 +121,7 @@ public class CampaignController {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
         ModelAndView modelAndView = new ModelAndView();
 
-        //in case that the user is trying to access the url without the manager privilege over his campaign
+        //in case that the user tries to access the url without the manager privilege over the campaign
         UserPV userInSession = utils.getUserFromSession();
         if (campaign.getUsrManager().getId() != userInSession.getId()) {
             redirectAttributes.addFlashAttribute("message", new Message("warning", "Only the campaign manager can upload files into the campaign"));

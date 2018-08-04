@@ -46,11 +46,11 @@ public class Peak {
 
     @Column
     @Expose
-    private Long positivePeaksValidity=0l;
+    private Long positivePeaksValidity=0l; //when a worker set the annotation to VALID add 1
 
     @Column
     @Expose
-    private Long negativePeaksValidity=0l;
+    private Long negativePeaksValidity=0l; //when a worker set the annotation to NOT VALID add 1
 
     @Column
     @Expose

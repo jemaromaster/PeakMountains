@@ -3,6 +3,7 @@ package polimi.awt.logic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import polimi.awt.Utils;
 import polimi.awt.model.Privilege;
@@ -24,6 +25,12 @@ public class UserLogic {
 
         Set<Privilege> privilegeList = utils.getPrivileges(newUser.getPrivileges());
         newUser.setPrivileges(privilegeList);
+
+        //we encrypt the password
+        String passToEncrypt = newUser.getPassword();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
+        String encodedPass = encoder.encode(passToEncrypt);
+        newUser.setPassword(encodedPass);
 
         newUser = this.controlUser(newUser);
         return userRepository.save(newUser);
