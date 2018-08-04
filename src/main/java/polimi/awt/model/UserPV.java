@@ -6,10 +6,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 import java.util.Set;
-
+// Entity genera tabla
 @Entity
 public class UserPV {
-
+    // primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -24,10 +24,12 @@ public class UserPV {
     @Column(unique = true)
     private String email;
 
+    // Eager: Trae toda la lista en busqueda pero al repetir no debe esforzarse tanto
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
     private Set<Privilege> privileges;
 
+    // Lazy: trae solo uno pero al repetir de debe hacerlo de nuevo
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "workersJoined", cascade = CascadeType.ALL)
     private Set<Campaign> campaignsJoined;
 

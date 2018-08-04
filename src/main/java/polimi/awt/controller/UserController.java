@@ -1,5 +1,6 @@
 package polimi.awt.controller;
-
+import org.springframework.web.bind.annotation.PutMapping;
+import polimi.awt.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +16,12 @@ import java.util.LinkedHashSet;
 
 @Controller
 public class UserController {
-
+    // Inyecta: instancia de la clase en el container.
     @Autowired
     UserLogic userLogic;
+
+    @Autowired
+    Utils utils;
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute(name = "user") UserPV userPV, @ModelAttribute(name = "userType") String userType,
@@ -36,6 +40,7 @@ public class UserController {
         return "/login";
     }
 
+    // Leugo de logear recuperamos los datos de UserPV y userType de la vez anterior.
     @GetMapping("/login")
     public String login(Model model) {
         model.addAttribute("user", new UserPV());
@@ -48,7 +53,7 @@ public class UserController {
         return "/error/page_403";
     }
 
-
+    // spring magic esto no lo hace
     @PostMapping("/login")
     public String loginPost(@ModelAttribute(name = "user") UserPV userPV) {
         Boolean bool = userLogic.loginUsernamePass(userPV.getUsername(), userPV.getPassword());
@@ -60,5 +65,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/profile")
+    public String profile(Model model){
+        UserPV userInSession = utils.getUserFromSession();
+        model.addAttribute("userInSession", userInSession);
+
+        return "/profile";
+    }
+
+    @PostMapping("/profile")
+    public String profilePut(@ModelAttribute(name = "userInSession") UserPV userPV) {
+        userLogic.updateUser(userPV.getUsername(), userPV);
+        return "/profile";
+    }
 
 }

@@ -58,9 +58,11 @@ public class UserLogic {
             Set<Privilege> privilegeList = utils.getPrivileges(userToUpdate.getPrivileges());
             userToUpdate.setPrivileges(privilegeList);
         }
-
+        userToUpdate.setPassword(userOld.getPassword());
         return userRepository.save(userToUpdate);
     }
+
+
 
     public Boolean loginUsernamePass(String username, String pass) {
         UserPV user = userRepository.findByUsername(username);
