@@ -81,6 +81,26 @@ public class UserLogic {
         }
     }
 
+    public UserPV changePassword(String userName, UserPV userToUpdate, String new_password) {
+
+        UserPV userOld = userRepository.findByUsername(userName);
+        //we encrypt the password
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
+        String encodedPass = encoder.encode(new_password);
+
+        if (userOld==null){
+            throw new RuntimeException("Username to update not found");
+        }
+        userToUpdate.setId(userOld.getId());
+
+        if (userToUpdate.getPrivileges() != null) {
+            Set<Privilege> privilegeList = utils.getPrivileges(userToUpdate.getPrivileges());
+            userToUpdate.setPrivileges(privilegeList);
+        }
+        userToUpdate.setPassword(encodedPass);
+        return userRepository.save(userToUpdate);
+    }
+
 
     public Page<UserPV> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);

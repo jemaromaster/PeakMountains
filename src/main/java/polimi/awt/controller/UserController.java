@@ -1,5 +1,6 @@
 package polimi.awt.controller;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.thymeleaf.expression.Strings;
 import polimi.awt.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import polimi.awt.logic.UserLogic;
 import polimi.awt.utils.Message;
 import polimi.awt.model.Privilege;
@@ -79,4 +81,22 @@ public class UserController {
         return "/profile";
     }
 
+    @GetMapping("/password")
+    public String password(Model model){
+        UserPV userInSession = utils.getUserFromSession();
+        model.addAttribute("pass1", "");
+        model.addAttribute("pass2", "");
+        model.addAttribute("userInSession", userInSession);
+        return "/password";
+    }
+
+    @PostMapping("/password")
+    public String passwordPut(@RequestParam String pass1,
+                              @RequestParam String pass2) {
+        UserPV userPV = utils.getUserFromSession();
+        if ( pass1.equals(pass2)) {
+            userLogic.changePassword(userPV.getUsername(), userPV, pass1);
+        }
+        return "/password";
+    }
 }
