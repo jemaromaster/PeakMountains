@@ -9,12 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 import polimi.awt.logic.UserLogic;
 import polimi.awt.utils.Message;
 import polimi.awt.model.Privilege;
 import polimi.awt.model.UserPV;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashSet;
+
 
 @Controller
 public class UserController {
@@ -76,9 +79,27 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public String profilePut(@ModelAttribute(name = "userInSession") UserPV userPV) {
-        userLogic.updateUser(userPV.getUsername(), userPV);
-        return "/profile";
+    public ModelAndView profilePut(@ModelAttribute(name = "userInSession") UserPV userPV,
+                             Model model,
+                             RedirectAttributes redir) {
+
+        Message message = null;
+
+        try {
+            userLogic.updateUser(userPV.getUsername(), userPV);
+            message = new Message("Success", "The new information was changed successfully.");
+            model.addAttribute("message", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = new Message("Warning", "There was a problem changing the personal information.");
+            model.addAttribute("message", message);
+        }
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/home/");
+        redir.addFlashAttribute("message", message);
+
+        return modelAndView;
+
     }
 
     @GetMapping("/password")
@@ -90,13 +111,30 @@ public class UserController {
         return "/password";
     }
 
+    // please remember that request param take from the name so we don't have to create an object
     @PostMapping("/password")
-    public String passwordPut(@RequestParam String pass1,
-                              @RequestParam String pass2) {
+    public ModelAndView passwordPut(@RequestParam String pass1,
+                              @RequestParam String pass2,
+                              Model model,
+                              RedirectAttributes redir) {
+        Message message = null;
         UserPV userPV = utils.getUserFromSession();
         if ( pass1.equals(pass2)) {
-            userLogic.changePassword(userPV.getUsername(), userPV, pass1);
+            try {
+                userLogic.changePassword(userPV.getUsername(), userPV, pass1);
+                message = new Message("Success", "The new password was changed successfully.");
+                model.addAttribute("message", message);
+            } catch (Exception e) {
+                e.printStackTrace();
+                message = new Message("Warning", "There was a problem changing the password.");
+                model.addAttribute("message", message);
+            }
         }
-        return "/password";
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/profile/");
+        redir.addFlashAttribute("message", message);
+
+        return modelAndView;
     }
 }

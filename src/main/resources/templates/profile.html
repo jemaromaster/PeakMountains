@@ -46,13 +46,13 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>Form Design <small>different form elements</small></h2>
+
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
                                 <br />
                                 <form id="demo-form2" data-parsley-validate="true" class="form-horizontal form-label-left"
-                                      th:action="@{/password}" th:object="${userInSession}" method="post">
+                                      th:action="@{/profile}" th:object="${userInSession}" method="post">
 
                                     <div class="form-group">
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12"> Name <span class="required">*</span>
@@ -67,7 +67,7 @@
                                         <label class="control-label col-md-3 col-sm-3 col-xs-12"> Email <span class="required">*</span>
                                         </label>
                                         <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="text" id="user-email" name="last-name" required="required" class="form-control col-md-7 col-xs-12"
+                                            <input type="email" id="user-email" name="last-name" required="required" class="form-control col-md-7 col-xs-12"
                                                    th:value="${email}" readonly="readonly"
                                                    th:field="*{email}"/>
                                         </div>
@@ -77,9 +77,13 @@
                                         <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                                             <button class="btn btn-primary" type="button" onclick="enable_edit()">Enable changes</button>
                                             <button type="submit" id="submit" class="btn btn-success" disabled="True">Submit</button>
+
                                         </div>
                                     </div>
                                 </form>
+                                <div>
+                                    <a th:href="@{/password}"><button  class="btn btn-danger btn-xs"> Change Password</button></a>
+                                </div>
                             </div>
                         </div>
                     </div>
