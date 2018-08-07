@@ -3,7 +3,6 @@ package polimi.awt.logic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import polimi.awt.Utils;
 import polimi.awt.model.Privilege;
@@ -28,8 +27,7 @@ public class UserLogic {
 
         //we encrypt the password
         String passToEncrypt = newUser.getPassword();
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(11);
-        String encodedPass = encoder.encode(passToEncrypt);
+        String encodedPass = utils.encodePassword(passToEncrypt);
         newUser.setPassword(encodedPass);
 
         newUser = this.controlUser(newUser);
@@ -79,6 +77,25 @@ public class UserLogic {
         } else {
             return true;
         }
+    }
+
+    public UserPV changePassword(String userName, UserPV userToUpdate, String new_password) {
+
+        UserPV userOld = userRepository.findByUsername(userName);
+
+        String encodedPass = utils.encodePassword(new_password);
+
+        if (userOld==null){
+            throw new RuntimeException("Username to update not found");
+        }
+        userToUpdate.setId(userOld.getId());
+
+        if (userToUpdate.getPrivileges() != null) {
+            Set<Privilege> privilegeList = utils.getPrivileges(userToUpdate.getPrivileges());
+            userToUpdate.setPrivileges(privilegeList);
+        }
+        userToUpdate.setPassword(encodedPass);
+        return userRepository.save(userToUpdate);
     }
 
 

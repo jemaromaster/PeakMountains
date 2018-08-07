@@ -5,11 +5,13 @@ import org.hibernate.proxy.HibernateProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import polimi.awt.model.Privilege;
 import polimi.awt.model.UserPV;
 import polimi.awt.repo.PrivilegeRepository;
 import polimi.awt.repo.UserRepository;
+import polimi.awt.security.SecurityConfiguration;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -23,6 +25,9 @@ public class Utils {
     @Autowired
     private PrivilegeRepository privilegeRepository;
 
+    @Autowired
+    SecurityConfiguration securityConfiguration;
+
     public UserPV getUserFromSession() {
         String auth = SecurityContextHolder.getContext().getAuthentication().getName();
 //        String auth = "w1";
@@ -31,6 +36,18 @@ public class Utils {
             throw new UsernameNotFoundException(auth);
         }
         return user;
+    }
+
+    public String encodePassword(String planePass) {
+        //we encrypt the password
+        BCryptPasswordEncoder encoder = (BCryptPasswordEncoder) securityConfiguration.encoder();
+        String encodedPass = encoder.encode(planePass);
+        return encodedPass;
+    }
+
+    public Boolean comparePlaneToEncodedPassword(String rawPass, String encodedToCompare) {
+        BCryptPasswordEncoder encoder = (BCryptPasswordEncoder) securityConfiguration.encoder();
+        return encoder.matches(rawPass,encodedToCompare);
     }
 
 //    list the privileges

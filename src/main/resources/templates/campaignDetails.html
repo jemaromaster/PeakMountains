@@ -355,6 +355,24 @@
         animation:false
     });
 
+    viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-forms allow-scripts allow-top-navigation');
+    viewer.infoBox.frame.addEventListener('load', function() {
+        //
+        // Now that the description is loaded, register a click listener inside
+        // the document of the iframe.
+        //
+        viewer.infoBox.frame.contentDocument.body.addEventListener('click', function(e) {
+            //
+            // The document body will be rewritten when the selectedEntity changes,
+            // but this body listener will survive.  Now it must determine if it was
+            // one of the clickable buttons.
+            //
+            if (e.target && e.target.className === 'btn btn-default btn-sm') {
+                console.log(e);
+                // window.location.replace("http://www.google.com");
+            }
+        }, false);
+    }, false);
     for (var i = 0; i < peaks.length; i++) {
         viewer.entities.add({
             position : Cesium.Cartesian3.fromDegrees(peaks[i].longitude, peaks[i].latitude, peaks[i].altitude*3),
@@ -364,17 +382,27 @@
                 scale:0.8
                 // imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
                 // color : Cesium.Color.LIME
-            }
+            },
+            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button type='button' class='btn btn-default btn-sm'" +
+            "onclick=\"window.location.href='/peaks/" + peaks[i].id + "'\">" +
+            "Details </button>",
+            name: "Peak " + peaks[i].name
         });
     }
 
     viewer.camera.setView({
-        destination : new Cesium.Cartesian3.fromDegrees(peaks[0].longitude, peaks[0].latitude, peaks[i].altitude),
+        destination : new Cesium.Cartesian3.fromDegrees(peaks[0].longitude, peaks[0].latitude, peaks[0].altitude*3),
         // orientation : {
         //     heading : 4.731089976107251,
         //     pitch : -0.32003481981370063
         // }
     });
+
+    var toolbar = document.getElementById('toolbar');
+    function updateDisplay(stringToUpdate) {
+        toolbar.innerHTML = 'Number of times you clicked either button:';
+    }
+
 
 
     /*]]>*/
