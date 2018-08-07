@@ -56,8 +56,8 @@ public class CampaignController {
             model.addAttribute("campaignList", campaignList);
             return "/myCampaigns";
         }else{
-            List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
-            model.addAttribute("campaignList", campaignList);
+            List<Campaign> allCampaigns = campaignLogic.findAll( 0, 100).getContent();
+            model.addAttribute("allCampaign", allCampaigns);
             return "/workerCampaigns";
         }
 
