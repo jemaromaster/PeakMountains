@@ -34,8 +34,9 @@
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Profile</h3>
+                        <h3>Welcome to PeakVal App </h3>
                     </div>
+
 
                     <!--<div hidden="true" th:replace="fragments/searchFor :: search-field"/>-->
                 </div>
@@ -46,55 +47,56 @@
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
-                                <h2>User Information</h2>
+                                <h2>My campaigns
+                                </h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                    </li>
+                                </ul>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content">
-                                <br />
-                                <form id="demo-form2" data-parsley-validate="true" class="form-horizontal form-label-left"
-                                      th:action="@{/profile}" th:object="${userInSession}" method="post">
+                                <p class="text-muted font-13 m-b-30">
+                                    The campaigns created are shown below
+                                </p>
 
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12"> Username <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" id="user-name" required="required" class="form-control col-md-7 col-xs-12"
-                                                   th:value="${username}" readonly="readonly"
-                                                   th:field="*{username}"/>
-                                        </div>
+                                <div class="title_right">
+                                    <div class="col-md-5 col-sm-5 col-xs-12 form-group">
+                                        <button type="button" class="btn btn-success btn-sm"
+                                                th:onclick="|window.location.href='@{/campaign/new}'|"
+                                        ><i
+                                                class="fa fa-plus-square-o"></i>&nbsp;New Campaign
+                                        </button>
                                     </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12"> Role <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" id="role-name" required="required" class="form-control col-md-7 col-xs-12"
-                                                   th:value="${rol}" readonly="readonly"
-                                                   />
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="control-label col-md-3 col-sm-3 col-xs-12"> Email <span class="required">*</span>
-                                        </label>
-                                        <div class="col-md-6 col-sm-6 col-xs-12">
-                                            <input type="email" id="user-email" name="last-name" required="required" class="form-control col-md-7 col-xs-12"
-                                                   th:value="${email}" readonly="readonly"
-                                                   th:field="*{email}"/>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-md-offset-3  col-sm-6 col-sm-offset-3 col-xs-12">
-                                            <button class="btn btn-primary"  th:onclick="|window.location.href='@{/password}'|" type="button">Change Password</button>
-                                        </div>
-                                    </div>
-                                    <div class="ln_solid"></div>
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                                            <button class="btn btn-default" type="button" onclick="enable_edit()">Enable changes</button>
-                                            <button type="submit" id="submit" class="btn btn-success" disabled="True">Save</button>
-
-                                        </div>
-                                    </div>
-                                </form>
+                                </div>
+                                <table id="datatable-responsive"
+                                       class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0"
+                                       width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Created On</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
+                                    <tr th:each="camp : ${campaignList}">
+                                        <td th:text="${camp.id}">id</td>
+                                        <td th:text="${camp.name}">name</td>
+                                        <td th:text="${#calendars.format(camp.createdDate,'dd-MM-yyyy')}">date</td>
+                                        <td th:text="${camp.status}">status</td>
+                                        <td>
+                                            <button type="button" class="btn btn-default btn-xs"
+                                                    th:onclick="|window.location.href='@{/campaign/{campaignId}(campaignId=${camp.id})}'|"
+                                            > View campaign
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -102,12 +104,7 @@
             </div>
         </div>
         <!-- /page content -->
-        <script th:inline="javascript">
-            function enable_edit() {
-                $("#user-email").removeAttr('readonly');
-                $("#submit").attr('disabled', false);
-            }
-        </script>
+
         <!-- footer content -->
         <footer>
             <div class="pull-right">

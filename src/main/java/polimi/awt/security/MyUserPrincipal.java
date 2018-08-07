@@ -31,6 +31,11 @@ public class MyUserPrincipal implements UserDetails {
     public String getPassword() { return this.user.getPassword();
     }
 
+    public String getRoleName(){
+        ArrayList<Privilege> arrayPrivileges = new ArrayList<Privilege>(this.user.getPrivileges());
+        return arrayPrivileges.get(0).getName();
+    }
+
     @Override
     public String getUsername() {
         return this.user.getUsername();

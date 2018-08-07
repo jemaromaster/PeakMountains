@@ -3,6 +3,7 @@ package polimi.awt.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,8 +16,9 @@ import polimi.awt.model.Privilege;
 import polimi.awt.model.UserPV;
 import polimi.awt.utils.Message;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
-
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -74,6 +76,11 @@ public class UserController {
         UserPV userInSession = utils.getUserFromSession();
         model.addAttribute("userInSession", userInSession);
 
+        List<Privilege> rol = new ArrayList(userInSession.getPrivileges());
+
+        String rolName = StringUtils.capitalize(rol.get(0).getName());
+        model.addAttribute("rol", rolName);
+
         return "/profile";
     }
 
@@ -114,17 +121,17 @@ public class UserController {
     // please remember that request param take from the name so we don't have to create an object
     @PostMapping("/password")
     public ModelAndView passwordPost(@RequestParam String pass1,
-                                    @RequestParam String pass2,
-                                    @RequestParam String oldPass,
-                                    Model model,
-                                    RedirectAttributes redir) {
+                                     @RequestParam String pass2,
+                                     @RequestParam String oldPass,
+                                     Model model,
+                                     RedirectAttributes redir) {
         Message message = null;
         UserPV userPV = utils.getUserFromSession();
 
-        if (!utils.comparePlaneToEncodedPassword(oldPass, userPV.getPassword())){
+        if (!utils.comparePlaneToEncodedPassword(oldPass, userPV.getPassword())) {
             message = new Message("Warning", "Incorrect old password. The password was not changed.");
             model.addAttribute("message", message);
-        }else {
+        } else {
             if (pass1.equals(pass2)) {
                 try {
                     userLogic.changePassword(userPV.getUsername(), userPV, pass1);

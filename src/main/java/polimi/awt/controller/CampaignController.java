@@ -16,13 +16,16 @@ import polimi.awt.logic.PeakLogic;
 import polimi.awt.logic.UserLogic;
 import polimi.awt.model.Campaign;
 import polimi.awt.model.Peak;
+import polimi.awt.model.Privilege;
 import polimi.awt.model.UserPV;
 import polimi.awt.storage.StorageException;
 import polimi.awt.utils.Message;
 import polimi.awt.utils.Statistics;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class CampaignController {
@@ -43,9 +46,21 @@ public class CampaignController {
     @GetMapping("/home")
     public String campaigns(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
         UserPV userInSession = utils.getUserFromSession();
-        List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
-        model.addAttribute("campaignList", campaignList);
-        return "/myCampaigns";
+
+        Set<Privilege> privileges = userInSession.getPrivileges();
+        ArrayList<Privilege> privArray = new ArrayList<Privilege>(privileges);
+
+        //we get the type of user. If the user has both privileges, it access to the manager
+            if (privArray.size() > 1 || privArray.get(0).getName().equals("manager")) {
+            List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
+            model.addAttribute("campaignList", campaignList);
+            return "/myCampaigns";
+        }else{
+            List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
+            model.addAttribute("campaignList", campaignList);
+            return "/workerCampaigns";
+        }
+
     }
 
     //campaign list

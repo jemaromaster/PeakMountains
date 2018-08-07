@@ -18,6 +18,7 @@
         <div class="profile_info">
             <span>Hello,</span>
             <h2><p th:text="${#authentication.getPrincipal().getUsername()}"/></h2>
+            <h2><i><p th:text="${#authentication.getPrincipal().getRoleName()}"/></i></h2>
         </div>
         <div class="clearfix"></div>
     </div>
