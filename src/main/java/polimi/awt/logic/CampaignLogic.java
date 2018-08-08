@@ -294,7 +294,7 @@ public class CampaignLogic {
         return campaignRepository.save(campaignToClose);
     }
 
-    public Campaign suscribeToCampaign(Long campaignId) {
+    public Campaign subscribeToCampaign(Long campaignId) {
 
         //we get the user from the session
         UserPV user = utils.getUserFromSession();

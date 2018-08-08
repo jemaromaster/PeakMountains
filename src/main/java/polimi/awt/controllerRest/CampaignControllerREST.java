@@ -119,11 +119,11 @@ public class CampaignControllerREST {
         }
     }
 
-    @PostMapping(value = "/{campaignId}/suscribe")
-    public ResponseEntity<Campaign> suscribeToCampaign(@PathVariable Long campaignId) {
+    @PostMapping(value = "/{campaignId}/subscribe")
+    public ResponseEntity<Campaign> subscribeToCampaign(@PathVariable Long campaignId) {
 
         try {
-            Campaign campToReturn =  campaignLogic.suscribeToCampaign(campaignId);
+            Campaign campToReturn =  campaignLogic.subscribeToCampaign(campaignId);
             return new ResponseEntity<Campaign>(campToReturn, HttpStatus.OK);
         } catch (StorageException e) {
             e.printStackTrace();

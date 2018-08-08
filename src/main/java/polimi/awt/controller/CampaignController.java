@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -91,7 +92,6 @@ public class CampaignController {
     public String home() {
         return "redirect:/home";
     }
-
 
     @GetMapping("/campaign/new")
     public String createCampaign(Model model) {
@@ -221,6 +221,31 @@ public class CampaignController {
         //in order to redirect to a previous page, and add a message
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("redirect:/campaign/" + campaignId);
+        redir.addFlashAttribute("message", message);
+        return modelAndView;
+    }
+
+    @PostMapping(value = "/campaign/{campaignId}/subscribe")
+    public ModelAndView subscribeToCampaign(@PathVariable("campaignId") Long campaignId, @Param("from") String from, Model model, RedirectAttributes redir) {
+        Message message = null;
+        try {
+            Campaign campToReturn = campaignLogic.subscribeToCampaign(campaignId);
+            message = new Message("Success", "You have suscribed to " + campToReturn.getName() + " successfully.");
+            model.addAttribute("message", message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            message = new Message("Warning", "There was a problem suscribing to the campaign with ID=" + campaignId + ".");
+            model.addAttribute("message", message);
+        }
+
+        //in order to redirect to a previous page, and add a message
+        ModelAndView modelAndView = new ModelAndView();
+
+        if (from!=null && from.equals("home")){ //to know from which page the request came
+            modelAndView.setViewName("redirect:/home");
+        }else {
+            modelAndView.setViewName("redirect:/campaign/" + campaignId);
+        }
         redir.addFlashAttribute("message", message);
         return modelAndView;
     }
