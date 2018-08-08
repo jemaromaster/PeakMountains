@@ -132,6 +132,19 @@ public class CampaignLogic {
         return campaignRepository.findCampaignByUsrManager(manager, new PageRequest(page, size));
     }
 
+    public List<Campaign> listCampaignByWorkers(UserPV worker, Integer page, Integer size) {
+        ArrayList<UserPV> listaWorkers = new ArrayList<UserPV>();
+        listaWorkers.add(worker);
+        Page<Campaign> listCampaignJoined = campaignRepository.findCampaignByWorkersJoinedOrderById(listaWorkers, new PageRequest(page, size));
+
+        return listCampaignJoined.getContent();
+    }
+
+    public Page<Campaign> listCampaignByWorkersJoinedIsNotAndStatusEquals(Set<UserPV> workerSet, String status, Integer page, Integer size) {
+        Page<Campaign> listCamp = campaignRepository.findCampaignsByStatusEqualsAndWorkersJoinedIsNotContaining(status, workerSet, new PageRequest(page, size));
+        return listCamp;
+    }
+
     public Campaign findCampaignById(Long findById) {
         //we get the user from the session
         return campaignRepository.findCampaignById(findById);

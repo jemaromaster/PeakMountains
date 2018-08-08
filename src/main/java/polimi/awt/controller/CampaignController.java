@@ -24,6 +24,7 @@ import polimi.awt.utils.Statistics;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,14 +51,21 @@ public class CampaignController {
         Set<Privilege> privileges = userInSession.getPrivileges();
         ArrayList<Privilege> privArray = new ArrayList<Privilege>(privileges);
 
-        //we get the type of user. If the user has both privileges, it access to the manager
-            if (privArray.size() > 1 || privArray.get(0).getName().equals("manager")) {
+        //get the role of the user. If the user has both privileges, it access to the manager only
+        if (privArray.size() > 1 || privArray.get(0).getName().equals("manager")) {
             List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
             model.addAttribute("campaignList", campaignList);
             return "/myCampaigns";
-        }else{
-            List<Campaign> allCampaigns = campaignLogic.findAll( 0, 100).getContent();
-            model.addAttribute("allCampaign", allCampaigns);
+        } else { //the role is a worker. Display the worker home page
+
+            List<Campaign> campaignsJoined =  campaignLogic.listCampaignByWorkers(userInSession, 0, 100);
+            model.addAttribute("campaignsJoined", campaignsJoined);
+
+            Set<UserPV> set = new HashSet();
+            set.add(userInSession);
+            List<Campaign> allCampaigns = campaignLogic.listCampaignByWorkersJoinedIsNotAndStatusEquals(set,"started", 0, 100).getContent();
+            model.addAttribute("allCampaignStarted", allCampaigns);
+
             return "/workerCampaigns";
         }
 
