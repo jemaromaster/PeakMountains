@@ -13,6 +13,7 @@ import polimi.awt.repo.PrivilegeRepository;
 import polimi.awt.repo.UserRepository;
 import polimi.awt.security.SecurityConfiguration;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -37,6 +38,21 @@ public class Utils {
         }
         return user;
     }
+
+    //    list the privileges
+    public String getRolUserInSession(){
+        UserPV userInSession = this.getUserFromSession();
+        Set<Privilege> privileges = userInSession.getPrivileges();
+        ArrayList<Privilege> privArray = new ArrayList<Privilege>(privileges);
+
+        //get the role of the user. If the user has both privileges, it access to the manager only
+        if (privArray.size() > 1 || privArray.get(0).getName().equals("manager")) {
+            return privArray.get(0).getName();
+        }else{
+            return privArray.get(0).getName();
+        }
+    }
+
 
     public String encodePassword(String planePass) {
         //we encrypt the password

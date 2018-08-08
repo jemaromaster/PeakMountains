@@ -17,14 +17,12 @@ import polimi.awt.logic.PeakLogic;
 import polimi.awt.logic.UserLogic;
 import polimi.awt.model.Campaign;
 import polimi.awt.model.Peak;
-import polimi.awt.model.Privilege;
 import polimi.awt.model.UserPV;
 import polimi.awt.storage.StorageException;
 import polimi.awt.utils.Message;
 import polimi.awt.utils.Statistics;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,13 +45,11 @@ public class CampaignController {
     //campaign list
     @GetMapping("/home")
     public String campaigns(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
-        UserPV userInSession = utils.getUserFromSession();
-
-        Set<Privilege> privileges = userInSession.getPrivileges();
-        ArrayList<Privilege> privArray = new ArrayList<Privilege>(privileges);
+        UserPV userInSession= utils.getUserFromSession();
+        String rolInSession = utils.getRolUserInSession();
 
         //get the role of the user. If the user has both privileges, it access to the manager only
-        if (privArray.size() > 1 || privArray.get(0).getName().equals("manager")) {
+        if (rolInSession.equals("manager")) {
             List<Campaign> campaignList = campaignLogic.listCampaignByManager(userInSession.getUsername(), 0, 100).getContent();
             model.addAttribute("campaignList", campaignList);
             return "/myCampaigns";
@@ -79,6 +75,16 @@ public class CampaignController {
         Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0, 50);
         model.addAttribute("campaign", campaign);
         List<Peak> list = listaPeaks.getContent();
+
+        //if there is a worker in session
+        UserPV userInSession = utils.getUserFromSession();
+        String rolUserInSession = utils.getRolUserInSession();
+        if (rolUserInSession.equals("worker")){
+            Boolean b = campaignLogic.isWorkerSubscribedToCampaign(campaign, userInSession);
+            model.addAttribute("subscribedTo",  b);
+        }else{
+            model.addAttribute("subscribedTo",  null);
+        }
 
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String jsonList = gson.toJson(list);
@@ -128,8 +134,8 @@ public class CampaignController {
         //in case that the user is trying to access the url without the manager privilege over his campaign
         UserPV userInSession = utils.getUserFromSession();
         if (campaign.getUsrManager().getId() != userInSession.getId()) {
-            redirectAttributes.addFlashAttribute("message", new Message("warning", "Only the campaign manager can upload files into the campaign"));
-            modelAndView.setViewName("redirect:home");
+            redirectAttributes.addFlashAttribute("message", new Message("Warning", "Only the campaign manager can upload files into the campaign"));
+            modelAndView.setViewName("redirect:/home");
             return modelAndView;
         }
         model.addAttribute(campaign);
@@ -147,8 +153,8 @@ public class CampaignController {
         //in case that the user tries to access the url without the manager privilege over the campaign
         UserPV userInSession = utils.getUserFromSession();
         if (campaign.getUsrManager().getId() != userInSession.getId()) {
-            redirectAttributes.addFlashAttribute("message", new Message("warning", "Only the campaign manager can upload files into the campaign"));
-            modelAndView.setViewName("redirect:home");
+            redirectAttributes.addFlashAttribute("message", new Message("Warning", "Only the campaign manager visualize the statistics in a campaign"));
+            modelAndView.setViewName("redirect:/home");
             return modelAndView;
         }
 

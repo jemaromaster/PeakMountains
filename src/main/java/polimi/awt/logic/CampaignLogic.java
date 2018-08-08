@@ -26,10 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CampaignLogic {
@@ -317,6 +314,11 @@ public class CampaignLogic {
         return campaignToSuscribe;
     }
 
+    public Boolean isWorkerSubscribedToCampaign(Campaign campaign, UserPV worker){
+        HashSet<UserPV> hs = new HashSet<>();
+        hs.add(worker);
+        return campaignRepository.existsCampaignsByWorkersJoinedContainingAndIdEquals(hs, campaign.getId());
+    }
     public Statistics getStatistics(Campaign campaign) {
         //we get the user from the session
         Statistics stat = new Statistics();
