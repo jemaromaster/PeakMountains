@@ -68,7 +68,8 @@
                             <div class="x_title">
                                 <h2><!--/*@thymesVar id="campaign" type="polimi.awt.model.Campaign"*/-->
                                     <p th:text=" ${campaign.name} "/>
-                                    <i><span th:text="'Status: ' + ${campaign.status} "/></i>
+                                    <i><span th:text="'Status: ' + ${campaign.status} + '.'"/></i>
+                                    <i><span th:if="${#authentication.getPrincipal().getRoleName() == 'worker'}" th:text="'Manager: ' + ${campaign.usrManager.username}+ '.'"/></i>
                                 </h2>
 
                                 <!--this div is only shown to the manager roles-->
