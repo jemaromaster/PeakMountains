@@ -36,6 +36,9 @@ public class AnnotationLogic {
     @Autowired
     AlternativePeakAnnotationNameRepository nameForAnnotationRepository;
 
+    @Autowired
+    CampaignLogic campaignLogic;
+
     //the logic is controlled
     public Annotation createAnnotation(Annotation annotation, Long peakId) throws Exception {
 
@@ -60,17 +63,23 @@ public class AnnotationLogic {
         if (peak == null) {
             throw new RuntimeException("Peak with id " + peakId + " could not be found");
         }
+
+        if (!campaignLogic.isWorkerSubscribedToCampaign(peak.getCampaign(), userFromSession)) {
+            throw new RuntimeException("You are not suscribed to this campaign.");
+        }
+
         //controls if the campaign name is not empty
-        String name = annotation.getName();
+        String name = annotation.getName().trim();
         if (name != null) {
             annotation.setName(name.trim());//cut spaces
         }
 
         //create the campaign start date
         annotation.setDateTimeCreated(new Date());
-        annotation.setPeakValidity(true);
         annotation.setPeak(peak);
         annotation.setUserPV(userFromSession);
+        annotation.setCampaign(peak.getCampaign());
+
 
         List<AlternativePeakAnnotationName> list = annotation.getLocalizedNames();
         Annotation annotationToReturn = annotationRepository.save(annotation);
@@ -80,6 +89,16 @@ public class AnnotationLogic {
                 nameForAnnotationRepository.save(an);
             }
         }
+
+        //maintain number statistics in peak
+        if (annotation.getPeakValidity()) {
+            peak.addPositivePeaksValidity();
+        } else {
+            peak.addPositivePeaksValidity();
+        }
+        peak.checkConflict(); //update the conflict state
+
+        peakRepository.save(peak);
         return annotationRepository.save(annotation);
 
     }
@@ -135,20 +154,20 @@ public class AnnotationLogic {
 
         annotationToReject.setStatus("VALID");
 
-        Long qAnnotation=null;
+        Long qAnnotation = null;
         Long qAnnotationRejected = null;
         //maintain color
-        if (peak.getToBeAnnotated()==false){
+        if (peak.getToBeAnnotated() == false) {
             peak.setColor("green");
-        }else{ //the peak is to be annotated. It could be yellow, orange or red
+        } else { //the peak is to be annotated. It could be yellow, orange or red
             qAnnotation = annotationRepository.countAnnotationByPeak(peak);
             qAnnotationRejected = annotationRepository.countAnnotationByPeakAndStatusEquals(peak, "REJECTED");
-            if(qAnnotation==0l){
+            if (qAnnotation == 0l) {
                 peak.setColor("yellow");
-            }else{
-                if (qAnnotationRejected==0l){
+            } else {
+                if (qAnnotationRejected == 0l) {
                     peak.setColor("orange");
-                }else{
+                } else {
                     peak.setColor("red");
                 }
             }
@@ -170,6 +189,13 @@ public class AnnotationLogic {
         }
         return annotationRepository.findAnnotationByPeak(peak, new PageRequest(page, size));
     }
+
+    public Annotation createAnnotationByPeak(Peak peak, UserPV userPV) {
+        //we get the user from the session
+        Annotation ann = new Annotation(peak, userPV);
+        return ann;
+    }
+
 
     public Annotation findAnnotationById(Long findById) {
         return annotationRepository.findAnnotationById(findById);

@@ -27,6 +27,7 @@ public class Peak {
     private String name;
 
     @OneToMany(mappedBy = "peak", fetch = FetchType.EAGER)
+    @Expose
     private List<AlternativePeakName> localizedNames = new ArrayList<AlternativePeakName>();
 
     @Column(name = "provenance", length = 30)
@@ -143,16 +144,26 @@ public class Peak {
         return positivePeaksValidity;
     }
 
-    public void setPositivePeaksValidity(Long positivePeaksValidity) {
-        this.positivePeaksValidity = positivePeaksValidity;
+    public void addPositivePeaksValidity() {
+        this.positivePeaksValidity = this.positivePeaksValidity + 1l ;
+    }
+
+    public Boolean  checkConflict(){
+        if (this.positivePeaksValidity>0 && this.negativePeaksValidity>0){
+            this.conflicts=true;
+
+        }else
+            this.conflicts=false;
+
+        return this.conflicts;
     }
 
     public Long getNegativePeaksValidity() {
         return negativePeaksValidity;
     }
 
-    public void setNegativePeaksValidity(Long negativePeaksValidity) {
-        this.negativePeaksValidity = negativePeaksValidity;
+    public void addNegativePeaksValidity() {
+        this.negativePeaksValidity = this.negativePeaksValidity + 1l;
     }
 
     public Boolean getConflicts() {

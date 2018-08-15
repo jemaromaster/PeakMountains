@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/head :: header-import"/>
+
+    <!-- iCheck -->
+    <link href="../../vendors/iCheck/skins/flat/green.css" rel="stylesheet"/>
+    <!-- Datatables -->
+    <link href="../../vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../../vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet"/>
+
+    <!--Leaflet library-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+          integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+          crossorigin=""/>
+</head>
+
+<body class="nav-md">
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+
+                <!-- sidebar menu fragment -->
+                <div th:replace="fragments/sidebar :: sidebar"/>
+                <!-- /sidebar menu fragment -->
+
+            </div>
+        </div>
+
+        <div th:replace="fragments/head :: header-body"/>
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div th:replace="fragments/messages :: messages-body"/>
+
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>New Annotation</h3>
+                    </div>
+
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2><!--/*@thymesVar id="peak" type="polimi.awt.model.Peak"*/-->
+                                    <p><a th:href="@{~/campaign/{campId}(campId=${peak.campaign.id})}"
+                                          th:text="${peak.campaign.name} + ' > ' + ${peak.name} "/>
+                                    </p>
+                                    <i><span th:text="'Status: ' + ${peak.color} "/></i>
+                                </h2>
+                                <div class="col-md-5 col-sm-5 col-xs-5 form-group"
+                                     th:if="${#authentication.getPrincipal().getRoleName() == 'worker'}">
+                                </div>
+                                <ul class="nav navbar-right panel_toolbox">
+
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <div class="x_content">
+                                <div class="title_right">
+
+                                    <div class="col-md-7 col-md-offset-0 col-sm-7 col-sm-offset-0 col-xs-12 form-group">
+                                        <div class="x_content">
+                                            <form class="form-horizontal form-label-left"
+                                                  th:action="@{/annotations(peakId=${peak.id})}"
+                                                  th:object="${annotation}" method="post"
+                                            >
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Is a valid
+                                                        peak?</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <div id="inputEditValid" class="radio">
+                                                            <label>
+                                                                <input type="radio" class="flat" checked="checked"
+                                                                       name="iCheck" th:value="${true}"
+                                                                       th:field="*{peakValidity}"/>
+                                                                Valid
+                                                            </label>
+                                                            <label>
+                                                                <input type="radio" class="flat" th:value="${false}"
+                                                                       name="iCheck" th:field="*{peakValidity}"/>
+                                                                Invalid
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input type="text"
+                                                               class="form-control col-md-10" th:field="*{name}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Location:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input readonly="readonly" type="text"
+                                                               class="form-control col-md-10"
+                                                               th:value="'[' + ${peak.longitude} + ', ' + ${peak.latitude} + ']'"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input type="text"
+                                                               class="form-control col-md-10"
+                                                               th:field="*{elevation}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Localized
+                                                        Names:</label>
+                                                    <div class="x_content col-md-9 col-sm-9 col-xs-12">
+                                                        <div class="title_right">
+                                                            <table class="table table-striped"
+                                                                   id="localizedNamesTable"
+                                                                   cellspacing="0"
+                                                                   width="100%">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th >Id</th>
+                                                                    <th>Name</th>
+                                                                    <th>Lang</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
+                                                                <tr th:each="row,rowStat : *{localizedNames}">
+                                                                    <td th:text="${rowStat.count}"></td>
+                                                                    <td th:field="*{localizedNames[__${rowStat.index}__].name}" th:text="*{localizedNames[__${rowStat.index}__].name}" ></td>
+                                                                    <td th:field="*{rowlocalizedNamess[__${rowStat.index}__].lang}" th:text="*{localizedNames[__${rowStat.index}__].lang}"></td>
+                                                                    <td>
+                                                                        <!--th:action="@{~/annotations/{annotationId}(annotationId=${camp.id})}"-->
+                                                                        <!--method="get"-->
+                                                                        <!--<button type="button"-->
+                                                                        <!--class="btn btn-default btn-xs"-->
+                                                                        <!--data-toggle="modal"-->
+                                                                        <!--data-target="#modalPeakDetails"-->
+                                                                        <!--th:onclick="'getAnnotationDetails(' + ${ln.id} + ');'"-->
+                                                                        <!--&gt;-->
+                                                                        <!--<i class="fa fa-eye"></i> View-->
+                                                                        <!--</button>-->
+
+                                                                        <button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames"
+                                                                                type="button"
+                                                                                id="btnDeleteLN"
+                                                                        ><i
+                                                                                class="fa fa-trash"></i>
+                                                                        </button>
+
+                                                                        <!--<button type="button" class="btn btn-default btn-xs">-->
+                                                                        <!--<i class="fa fa-times"></i> Reject-->
+                                                                        <!--</button>-->
+                                                                    </td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="x_content col-md-2 col-md-offset-10 col-sm-2 col-sm-offset-10 col-xs-3">
+                                                        <div class="row">
+                                                            <div class="btn-group btn-group-sm">
+                                                                <button class="btn btn-default" type="button"
+                                                                        id="btnAddLN"
+                                                                        data-toggle="modal"
+                                                                        data-target="#modalAddLocalizedName"><i
+                                                                        class="fa fa-plus"></i> Add
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="ln_solid"></div>
+
+                                                <div class="form-group">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                                        <button class="btn btn-primary" onclick="history.back(-1)"
+                                                                type="button">Cancel
+                                                        </button>
+                                                        <button type="submit" class="btn btn-success">Save</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Small modal for adding new campaign -->
+                                    <div id="modalAddLocalizedName" class="modal fade bs-example-modal-sm"
+                                         tabindex="-1" hidden="false"
+                                         role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+                                                    <button type="button" class="close"
+                                                            data-dismiss="modal"
+                                                            aria-label="Close"><span
+                                                            aria-hidden="true">×</span>
+                                                    </button>
+                                                    <h4 class="modal-title" id="myModalLabel2">Add
+                                                        a localized name</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <input type="text" id="inputNewLocalizedNames"
+                                                                   class="form-control col-md-10" min="3"
+                                                                   required="required"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Language
+                                                            code:</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <select id="selectLangOption" required="required"
+                                                                    class="form-control col-sm-6 col-md-6 col-xs-2">
+                                                                <option value="0">[Choose option]</option>
+                                                                <option value="EN">EN</option>
+                                                                <option value="ES">ES</option>
+                                                                <option value="DE">DE</option>
+                                                                <option value="IT">IT</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default btn-sm"
+                                                            data-dismiss="modal">Cancel
+                                                    </button>
+                                                    <button type="button" id="btnAddOptionToSelect"
+                                                            class="btn btn-primary btn-sm">Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /modals -->
+
+                                    <!--<div class="col-md-4 col-md-offset-1 col-sm-4 col-sm-offset-1 col-xs-12 form-group">-->
+                                    <!--<div id="mapid" style="height: 300px"></div>-->
+                                    <!--</div>-->
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /page content -->
+
+
+        <!-- Large modal for rejecting annotation -->
+        <div id="modalPeakDetails" class="modal fade bs-example-modal-lg"
+             tabindex="-1" hidden="false"
+             role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <!--th:action="@{~/annotation/{annotationId}/reject(campaignId=${annotationId.id})}"-->
+                <div id="replaceModalHere"/>
+            </div>
+        </div>
+
+        <!-- footer content -->
+        <footer>
+            <div class="pull-right">
+                PeakVal | Advance Web Technologies 2018
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="../../vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../../vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../../vendors/nprogress/nprogress.js"></script>
+<!-- iCheck -->
+<script src="../../vendors/iCheck/icheck.min.js"></script>
+
+<script src="../../vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../../vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../../vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="../../vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../../vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="../../vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="../../vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="../../vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="../../vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="../../vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="../../vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+<script src="../../vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+<script src="../../vendors/jszip/dist/jszip.min.js"></script>
+
+<!-- bootstrap-wysiwyg -->
+<script src="../../vendors/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js"></script>
+<script src="../../vendors/jquery.hotkeys/jquery.hotkeys.js"></script>
+<script src="../../vendors/google-code-prettify/src/prettify.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../../build/js/custom.min.js"></script>
+
+<!-- leaflet map 2d -->
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+        integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    /*[+
+    var peakString =[[${peakJson}]];
+    +]*/
+
+    $('#btnDeleteLN').click(function () {
+        var value = $('#inputEditLocalizedNames').find(":selected").val();
+
+        $("#inputEditLocalizedNames [value='" + value + "']").remove();
+    });
+
+    //to remove the row from the table
+    $(document).on('click', 'button.removebuttonlocalizednames', function () {
+        alert("aa");
+        $(this).closest('tr').remove();
+        return false;
+    });
+
+    $('#btnAddOptionToSelect').click(function () {
+        var newLocalizedName = $.trim($('#inputNewLocalizedNames').val());
+        var lang = $('#selectLangOption').find(":selected").val();
+        var rowCount = $('#localizedNamesTable tr').length;
+
+        console.log(newLocalizedName, lang);
+        if (newLocalizedName.length == 0) {
+            $('#inputNewLocalizedNames').attr('for', 'inputWarning');
+        } else if (lang == 0) {
+            $('#selectLangOption').attr('for', 'inputWarning');
+        } else {
+            //set value to null
+            $('#inputNewLocalizedNames').val('');
+            $("#selectLangOption").val($("#selectLangOption option:first").val());
+            var trString = '<tr>' +
+                '<td>' + rowCount + '</td>'+
+            '<td> ' + newLocalizedName + '</td>'+
+            '<td>' + lang + '</td>' +
+            '<td>' +
+            '<button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames" type="button"' +
+            'id="btnDeleteLN"' +
+            ' ><i class="fa fa-trash"></i>' +
+            '</button>' +
+            '</td>' +
+            '</tr>';
+
+            alert(trString);
+            $('#localizedNamesTable tr:last').after(trString);
+
+            $('#modalAddLocalizedName').modal('toggle');
+        }
+    });
+
+    var jsonPeak = JSON.parse(peakString);
+    var mymap = L.map('mapid').setView([jsonPeak.latitude, jsonPeak.longitude], 13);
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoiamVtYXJvbWFzdGVyIiwiYSI6ImNqaTR2eTRicTBkbXMzdm1ybzhsaHRzZmEifQ.3YESvQQqShg6m3aChbndkQ'
+    }).addTo(mymap);
+
+    var marker;
+
+    //define the icon colors
+    var greenIcon = new L.Icon({
+        iconUrl: '../../images/marker-icon-2x-green.png',
+        shadowUrl: '../../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+    var yellowIcon = new L.Icon({
+        iconUrl: '../../images/marker-icon-2x-yellow.png',
+        shadowUrl: '/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var redIcon = new L.Icon({
+        iconUrl: '../../images/marker-icon-2x-red.png',
+        shadowUrl: '../../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var orangeIcon = new L.Icon({
+        iconUrl: '../../images/marker-icon-2x-orange.png',
+        shadowUrl: '../../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var hashMapIcons = {};
+    hashMapIcons['yellow'] = yellowIcon;
+    hashMapIcons['red'] = redIcon;
+    hashMapIcons['green'] = greenIcon;
+    hashMapIcons['orange'] = orangeIcon;
+
+    // var marker = L.marker([jsonPeak.latitude, jsonPeak.longitude], {icon: hashMapIcons[jsonPeak.color]}).addTo(mymap);
+
+
+    /*]]>*/
+
+    function getAnnotationDetails(peakID) {
+        $.get("/annotations/" + peakID, function (data) {
+            console.log(data);
+            $("#replaceModalHere").html(data);
+        });
+    }
+</script>
+
+
+</body>
+</html>

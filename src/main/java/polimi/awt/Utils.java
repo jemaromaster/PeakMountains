@@ -66,7 +66,7 @@ public class Utils {
         return encoder.matches(rawPass,encodedToCompare);
     }
 
-//    list the privileges
+    //list the privileges
     public Set<Privilege> getPrivileges(Set<Privilege> roles){
 
         Set<Privilege> privilegeSet = new LinkedHashSet<>();

@@ -44,5 +44,4 @@ public class PeakLogic {
         return peak;
     }
 
-
 }

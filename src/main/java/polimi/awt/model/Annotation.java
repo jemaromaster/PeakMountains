@@ -22,7 +22,7 @@ public class Annotation {
     private Date dateTimeCreated;
 
     @Expose
-    private Boolean peakValidity= Boolean.TRUE;
+    private Boolean peakValidity= Boolean.TRUE; //the worker decides the peakValidity
 
     @Expose
     private Double elevation;
@@ -32,7 +32,7 @@ public class Annotation {
 
     @Column(name="type", length = 10)
     @Expose
-    private String status = "VALID"; //valid or rejected
+    private String status = "VALID"; //valid or rejected by the manager
 
     @OneToMany(mappedBy = "annotation",fetch = FetchType.EAGER)
     @Expose
@@ -48,6 +48,38 @@ public class Annotation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Campaign campaign;
 
+    public Annotation() {
+    }
+    public Annotation(Peak peak, UserPV userPV) {
+        this.dateTimeCreated = dateTimeCreated;
+        this.peakValidity = peakValidity;
+        this.elevation = elevation;
+        this.name = name;
+        this.status = status;
+        this.localizedNames = localizedNames;
+        this.userPV = userPV;
+        this.peak = peak;
+        this.campaign = campaign;
+
+        this.userPV = userPV;
+        this.peak = peak;
+        this.peakValidity = true;
+        this.status = "VALID";
+        this.dateTimeCreated = new Date();
+        this.name = peak.getName();
+        this.campaign = peak.getCampaign();
+        this.elevation = peak.getAltitude();
+
+        List<AlternativePeakName> lnP = peak.getLocalizedNames();
+        List<AlternativePeakAnnotationName> alternativePeakAnnotationNames = new ArrayList<>();
+        for (AlternativePeakName a: lnP){
+            AlternativePeakAnnotationName aAnnName = new AlternativePeakAnnotationName();
+            aAnnName.setName(a.getLang());
+            aAnnName.setLang(a.getName());
+            alternativePeakAnnotationNames.add(aAnnName);
+        }
+        this.localizedNames = alternativePeakAnnotationNames;
+    }
 
     public long getId() {
         return id;

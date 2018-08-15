@@ -45,7 +45,7 @@ public class CampaignController {
     //campaign list
     @GetMapping("/home")
     public String campaigns(@RequestParam(name = "name", required = false, defaultValue = "World") String name, Model model) {
-        UserPV userInSession= utils.getUserFromSession();
+        UserPV userInSession = utils.getUserFromSession();
         String rolInSession = utils.getRolUserInSession();
 
         //get the role of the user. If the user has both privileges, it access to the manager only
@@ -55,12 +55,12 @@ public class CampaignController {
             return "/myCampaigns";
         } else { //the role is a worker. Display the worker home page
 
-            List<Campaign> campaignsJoined =  campaignLogic.listCampaignByWorkers(userInSession, 0, 100);
+            List<Campaign> campaignsJoined = campaignLogic.listCampaignByWorkers(userInSession, 0, 100);
             model.addAttribute("campaignsJoined", campaignsJoined);
 
             Set<UserPV> set = new HashSet();
             set.add(userInSession);
-            List<Campaign> allCampaigns = campaignLogic.listCampaignByWorkersJoinedIsNotAndStatusEquals(set,"started", 0, 100).getContent();
+            List<Campaign> allCampaigns = campaignLogic.listCampaignByWorkersJoinedIsNotAndStatusEquals(set, "started", 0, 100).getContent();
             model.addAttribute("allCampaignStarted", allCampaigns);
 
             return "/workerCampaigns";
@@ -79,18 +79,30 @@ public class CampaignController {
         //if there is a worker in session
         UserPV userInSession = utils.getUserFromSession();
         String rolUserInSession = utils.getRolUserInSession();
-        if (rolUserInSession.equals("worker")){
+        if (rolUserInSession.equals("worker")) {
             Boolean b = campaignLogic.isWorkerSubscribedToCampaign(campaign, userInSession);
-            model.addAttribute("subscribedTo",  b);
-        }else{
-            model.addAttribute("subscribedTo",  null);
+            model.addAttribute("subscribedTo", b);
+        } else {
+            model.addAttribute("subscribedTo", null);
         }
 
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String jsonList = gson.toJson(list);
 
         model.addAttribute("listaPeaks", jsonList);
-        return "/campaignDetails";
+
+        if (rolUserInSession.equals("worker")) {
+            // for worker profile
+            if (campaignLogic.isWorkerSubscribedToCampaign(campaign, userInSession)) {
+                model.addAttribute("isSuscribedToCampaign", true);
+            } else {
+                model.addAttribute("isSuscribedToCampaign", false);
+                Message message = new Message("Warning", "You are not subscribed to this campaign. To start adding annotations, you must subscribe to it first!");
+                model.addAttribute("message", message);
+            }
+            return "/campaignDetailsWorker";
+        } else
+            return "/campaignDetails";
     }
 
 
@@ -247,9 +259,9 @@ public class CampaignController {
         //in order to redirect to a previous page, and add a message
         ModelAndView modelAndView = new ModelAndView();
 
-        if (from!=null && from.equals("home")){ //to know from which page the request came
+        if (from != null && from.equals("home")) { //to know from which page the request came
             modelAndView.setViewName("redirect:/home");
-        }else {
+        } else {
             modelAndView.setViewName("redirect:/campaign/" + campaignId);
         }
         redir.addFlashAttribute("message", message);

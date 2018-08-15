@@ -1,5 +1,7 @@
 package polimi.awt.model;
 
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.*;
 
 //Class to store the alternative name (different languages) of a Peak
@@ -9,11 +11,14 @@ public class PeakNameBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Expose
     private long id;
 
+    @Expose
     private String name;
 
     @Column(name = "lang", length = 10)
+    @Expose
     private String lang;
 
     public long getId() {

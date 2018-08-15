@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/head :: header-import"/>
+
+    <!-- iCheck -->
+    <link href="../vendors/iCheck/skins/flat/green.css" rel="stylesheet"/>
+    <!-- Datatables -->
+    <link href="../vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet"/>
+    <link href="../vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet"/>
+
+    <!--Leaflet library-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+          integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+          crossorigin=""/>
+
+    <style>
+        @import url(../build/cesium/Widgets/widgets.css);
+
+        html, body, #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body class="nav-md">
+
+<script>
+    var showMap3d = false;
+
+</script>
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+
+                <!-- sidebar menu fragment -->
+                <div th:replace="fragments/sidebar :: sidebar"/>
+                <!-- /sidebar menu fragment -->
+
+            </div>
+        </div>
+
+        <div th:replace="fragments/head :: header-body"/>
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div th:replace="fragments/messages :: messages-body"/>
+
+                <div class="page-title">
+                    <div class="title_left">
+                        <!--/*@thymesVar id="campaign" type="polimi.awt.model.Campaign"*/-->
+                        <h3>Campaign Details</h3>
+                    </div>
+
+                    <!--<div hidden="true" th:replace="fragments/searchFor :: search-field"/>-->
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2><!--/*@thymesVar id="campaign" type="polimi.awt.model.Campaign"*/-->
+                                    <p th:text=" ${campaign.name} "/>
+                                    <i><span th:text="'Status: ' + ${campaign.status} + '.'"/></i>
+                                    <i><span th:if="${#authentication.getPrincipal().getRoleName() == 'worker'}"
+                                             th:text="'Manager: ' + ${campaign.usrManager.username}+ '.'"/></i>
+                                </h2>
+
+                                <!--this div is only shown to the manager roles-->
+                                <div class="col-md-5 col-sm-5 col-xs-5 form-group"
+                                     th:hidden="${#authentication.getPrincipal().getRoleName() != 'manager'}">
+                                    <button th:if="${campaign.status=='created'}" type="button"
+                                            class="btn btn-success btn-sm" data-toggle="modal"
+                                            data-target="#modalStartCampaign"><i
+                                            class="fa fa-play-circle-o"></i>&nbsp;Start
+                                    </button>
+
+                                    <button th:if="${campaign.status=='started'}" type="button"
+                                            class="btn btn-danger btn-sm"
+                                            data-toggle="modal" data-target="#modalCloseCampaign"><i
+                                            class="fa fa-stop-circle-o"></i>&nbsp;Close
+                                    </button>
+
+                                    <!-- Small modal for closing campaign -->
+                                    <div id="modalCloseCampaign" class="modal fade bs-example-modal-sm" tabindex="-1"
+                                         hidden="false"
+                                         role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm">
+                                            <form th:action="@{~/campaign/{campaignId}/close(campaignId=${campaign.id})}"
+                                                  method="post">
+
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close"><span aria-hidden="true">×</span>
+                                                        </button>
+                                                        <h4 class="modal-title" id="myModalLabel2">Close campaign</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h4>Are you sure you want to close the campaign <span
+                                                                th:text="${campaign.name} "/>?</h4>
+                                                        <p>After the campaign is closed, workers won't be able to modify
+                                                            the annotations.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default btn-sm"
+                                                                data-dismiss="modal">Cancel
+                                                        </button>
+                                                        <button type="submit" class="btn btn-danger btn-sm">Close
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <!--this div is only shown to the worker roles-->
+                                <div class="col-md-5 col-sm-5 col-xs-5 form-group"
+                                     th:hidden="${#authentication.getPrincipal().getRoleName() != 'worker'}">
+
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm" data-toggle="modal"
+                                            data-target="#modalSusbscribeCampaign" th:if="${subscribedTo==false}"><i
+                                            class="fa fa-check"></i>&nbsp;Subscribe
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-default btn-sm" data-toggle="modal"
+                                            data-target="#modalSusbscribeCampaign" th:if="${subscribedTo==true}"
+                                            th:disabled="${subscribedTo==true}"><i
+                                            class="fa fa-check"></i>&nbsp;Subscribed
+                                    </button>
+
+                                    <!-- Small modal for susbscribing to campaign -->
+                                    <div id="modalSusbscribeCampaign" class="modal fade bs-example-modal-sm"
+                                         tabindex="-1" hidden="false"
+                                         role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-sm">
+                                            <form th:action="@{/campaign/{campaignId}/subscribe(campaignId=${campaign.id}, from='campaignDetails')}"
+                                                  method="post">
+
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                                aria-label="Close"><span
+                                                                aria-hidden="true">×</span>
+                                                        </button>
+                                                        <h4 class="modal-title" id="myModalLabelSuscribeToCampaign">
+                                                            Subscribe to
+                                                            campaign</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h4>Are you sure you want to subscribe to the
+                                                            campaign <i><span
+                                                                    th:text="${campaign.name} "/></i>?</h4>
+                                                        <p>After you suscribe to a campaign, you can start creating
+                                                            annotations.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default btn-sm"
+                                                                data-dismiss="modal">Cancel
+                                                        </button>
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            Subscribe
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <!-- /modals -->
+
+                                </div>
+
+                                <ul class="nav navbar-right panel_toolbox">
+
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <!-- Small modal for starting campaign -->
+                            <div id="modalStartCampaign" class="modal fade bs-example-modal-sm"
+                                 tabindex="-1" hidden="false"
+                                 role="dialog" aria-hidden="true">
+                                <div class="modal-dialog modal-sm">
+                                    <form th:action="@{~/campaign/{campaignId}/start(campaignId=${campaign.id})}"
+                                          method="post">
+
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close"><span aria-hidden="true">×</span>
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel2">Start
+                                                    campaign</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h4>Are you sure do you want to start the campaign <span
+                                                        th:text="${campaign.name} "/>?</h4>
+                                                <p>After the campaign is started, you will be able to upload
+                                                    peak files.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default btn-sm"
+                                                        data-dismiss="modal">Cancel
+                                                </button>
+                                                <button type="submit" class="btn btn-success btn-sm">Start
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- /modals -->
+
+                            <div class="x_content">
+                                <div class="title_right">
+                                    <!--this div is only shown to the manager roles-->
+                                    <div class="col-md-10 col-sm-10 col-xs-12 form-group"
+                                         th:hidden="${#authentication.getPrincipal().getRoleName() != 'manager'}">
+                                        <div class="col-md-12 col-sm-12 col-xs-12 form-group">
+                                            <button type="button" class="btn btn-default btn-sm"
+                                                    th:disabled="${campaign.status=='created'}"
+                                                    th:onclick="|window.location.href='@{/campaign/{campaignId}/statistics(campaignId=${campaign.id})}'|"
+                                            ><i
+                                                    class="fa fa-line-chart"></i>&nbsp;Statistics
+                                            </button>
+
+                                            <button type="button" class="btn btn-default btn-sm"
+                                                    th:disabled="${campaign.status=='created' or campaign.status=='closed'}"
+                                                    th:onclick="|window.location.href='@{/campaign/{campaignId}/uploadFile(campaignId=${campaign.id})}'|"
+                                            ><i class="fa fa-upload"></i>&nbsp;Upload File
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-7 col-md-offset-0 col-sm-7 col-sm-offset-0 col-xs-12 form-group">
+
+                                        <div th:if="${campaign.status=='created'}"
+                                             class="alert alert-info alert-dismissible fade in" role="alert">
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                                                    aria-hidden="true">×</span>
+                                            </button>
+                                            <strong><span th:text="${'Attention.'}"></span></strong> <span
+                                                th:text="${'The campaign does not count with any peak information yet. To start uploading peaks, you should start the campaign first.'}"></span>
+                                        </div>
+
+                                        <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                                            <ul id="myTab1" class="nav nav-tabs bar_tabs right" role="tablist">
+                                                <li role="presentation" class="active"><a href="#tab_content11"
+                                                                                          id="home-tabb" role="tab"
+                                                                                          data-toggle="tab"
+                                                                                          aria-controls="home"
+                                                                                          aria-expanded="true">2D
+                                                    Map</a>
+                                                </li>
+                                                <li role="presentation" class=""><a href="#tab_content22" role="tab"
+                                                                                    id="profile-tabb" data-toggle="tab"
+                                                                                    aria-controls="profile"
+                                                                                    aria-expanded="false">3D Map</a>
+                                                </li>
+                                            </ul>
+
+
+                                            <div id="myTabContent2" class="tab-content">
+                                                <div role="tabpanel" class="tab-pane fade active in" id="tab_content11"
+                                                     aria-labelledby="home-tab">
+                                                    <div id="mapid" style="height: 400px"></div>
+                                                </div>
+                                                <div role="tabpanel" class="tab-pane fade" id="tab_content22"
+                                                     aria-labelledby="profile-tab">
+                                                    <div id="cesiumContainer" style="height: 400px"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <span th:if="${campaign.status!='created'}">* The map first view is centered over the highest peak in the campaign.</span>
+                                    </div>
+
+                                    <div class="col-md-5 col-md-offset-0 col-sm-5 col-sm-offset-0 col-xs-12 form-group">
+                                        <div class="x_content">
+                                            <form id="formPeakSelected" class="form-horizontal form-label-left"
+                                                  hidden="true">
+                                                <span class="section">Peak Info</span>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input id="inputPeakName" readonly="readonly" type="text"
+                                                               class="form-control col-md-10"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Location:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input id="inputPeakGeoLocation" readonly="readonly" type="text"
+                                                               class="form-control col-md-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input id="inputPeakAltitude" readonly="readonly" type="text"
+                                                               class="form-control col-md-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Provenance</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <input id="inputPeakProvenance" readonly="readonly" type="text"
+                                                               class="form-control col-md-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Localized
+                                                        names:</label>
+                                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                                        <select id="inputPeakLocalizedNames" readonly="true"
+                                                                class="select2_multiple form-control"
+                                                                multiple="multiple">
+                                                            <option>[None]</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Available
+                                                        for annotation:</label>
+                                                    <div class="col-md-3 col-sm-3 col-xs-12">
+                                                        <input id="inputPeakAvailableForAnnotation" readonly="readonly"
+                                                               type="text"
+                                                               class="form-control col-md-10"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12  text-center">
+                                                        <!--th:onclick="|window.location.href='@{/campaign/{campaignId}/uploadFile(campaignId=${campaign.id})}'|"-->
+                                                        <button id="inputPeakButtonAnnotate" type="button"
+                                                                class="btn btn-danger btn-sm"
+                                                        >
+                                                            <i class="fa fa-compass"></i>&nbsp;Annotate Peak
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="ln_solid"></div>
+                                            </form>
+                                            <form id="infoPeakNotSelected" class="text-center pagination-centered">
+                                                <div class="ln_solid"></div>
+                                                <h4>You need to select a peak in the map to display it details</h4>
+                                                <div class="ln_solid"></div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+            <div class="pull-right">
+                PeakVal | Advance Web Technologies 2018
+            </div>
+            <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="../vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../vendors/nprogress/nprogress.js"></script>
+<!-- iCheck -->
+<script src="../vendors/iCheck/icheck.min.js"></script>
+
+<script src="../vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="../vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="../vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="../vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="../vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+<script src="../vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+<script src="../vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+<script src="../vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+<script src="../vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="../vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="../vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+<script src="../vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+<script src="../vendors/jszip/dist/jszip.min.js"></script>
+<script src="../vendors/pdfmake/build/pdfmake.min.js"></script>
+<script src="../vendors/pdfmake/build/vfs_fonts.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../build/js/custom.min.js"></script>
+
+<script src="../build/cesium/Cesium.js"></script>
+<!-- leaflet map 2d -->
+<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+        integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+        crossorigin=""></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    //this comment is for thymleaf to know where to inject the data
+    /*[+
+    var peaksString = [[${listaPeaks}]];
+     +]*/
+    var marker;
+
+    //MAP 2D configurations
+    //define the icon colors
+    var greenIcon = new L.Icon({
+        iconUrl: '../images/marker-icon-2x-green.png',
+        shadowUrl: '../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+    var yellowIcon = new L.Icon({
+        iconUrl: '../images/marker-icon-2x-yellow.png',
+        shadowUrl: '../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var redIcon = new L.Icon({
+        iconUrl: '../images/marker-icon-2x-red.png',
+        shadowUrl: '../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var orangeIcon = new L.Icon({
+        iconUrl: '../images/marker-icon-2x-orange.png',
+        shadowUrl: '../images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
+
+    var hashMapIcons = {};
+    hashMapIcons['yellow'] = yellowIcon;
+    hashMapIcons['red'] = redIcon;
+    hashMapIcons['green'] = greenIcon;
+    hashMapIcons['orange'] = orangeIcon;
+
+    peaks = JSON.parse(peaksString);
+
+    var mymap = L.map('mapid').setView([peaks[0].latitude, peaks[0].longitude], 13);
+
+    //function to modify right panel
+    function onClickOverMarker(peakLocalId) {
+        var peakInfo = peaks[peakLocalId];
+        console.log(peakInfo);
+        var isSuscribedCamp = /*[[${isSuscribedToCampaign}]]*/'false';
+
+        $('#infoPeakNotSelected').hide();
+        $('#formPeakSelected').show();
+
+        $('#inputPeakName').val(peakInfo['name']);
+        $('#inputPeakGeoLocation').val('[' + peakInfo['latitude'] + ', ' + peakInfo['longitude'] + ']');
+        $('#inputPeakAltitude').val(peakInfo['altitude'] + 'm');
+        $('#inputPeakProvenance').val(peakInfo['provenance']);
+
+        $('#inputPeakAvailableForAnnotation').val(peakInfo['toBeAnnotated'] == true ? 'Yes.' : 'No.');
+
+        //we set to true or false to be annotate
+        $('#inputPeakButtonAnnotate').prop('disabled', !(peakInfo['toBeAnnotated'] && isSuscribedCamp == true));
+        $('#inputPeakButtonAnnotate').on("click", function (){ window.location.href="/peaks/"+ peakInfo.id + "/annotate"});
+
+        $('#inputPeakLocalizedNames').find('option').remove().end();
+        if (peakInfo['localizedNames'].length > 0) {
+            var arrayLN = peakInfo['localizedNames'];
+            arrayLN.forEach(function (ln) {
+                $('#inputPeakLocalizedNames').append($('<option>', {
+                    value: ln['id'],
+                    text: ln['name']+ (ln['lang']!=null ? ' [' + ln['lang'].toUpperCase() + ']' : '')
+                }));
+            });
+        } else {
+            $('#inputPeakLocalizedNames').append($('<option>', {
+                value: 1,
+                text: '[None]'
+            }));
+        }
+    }
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        // attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        id: 'mapbox.streets',
+        accessToken: 'pk.eyJ1IjoiamVtYXJvbWFzdGVyIiwiYSI6ImNqaTR2eTRicTBkbXMzdm1ybzhsaHRzZmEifQ.3YESvQQqShg6m3aChbndkQ'
+    }).addTo(mymap);
+
+    for (var i = 0; i < peaks.length; i++) {
+        var marker = L.marker([peaks[i].latitude, peaks[i].longitude], {
+            customPeakObject: i,
+            icon: hashMapIcons[peaks[i].color]
+        }).on('click', function () {
+            onClickOverMarker(this.options.customPeakObject);
+        }).addTo(mymap);
+        marker.bindPopup("<b>" + peaks[i].name + "</b><br></br> Altitude: " + peaks[i].altitude + "m."
+        );
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //MAP 3D configurations
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMGZkYTg4MC04NDJjLTQzNmMtYTE1NC1kM2FkMTQwOTVjOTgiLCJpZCI6MjQzOSwiaWF0IjoxNTMzMjI3MTgxfQ.QtcIH_OhAiRo5eXT2zyNjNXCiYurffe4yP7l1o3ZkpI';
+
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+        terrainExaggeration: 2.0, // use the Bing Maps Aerial imagery from ion (this is the default)
+        terrainProvider: Cesium.createWorldTerrain(), // use the Cesium World Terrain from ion
+        timeline: false,
+        animation: false
+    });
+
+    viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-forms allow-scripts allow-top-navigation');
+    viewer.infoBox.frame.addEventListener('load', function () {
+        //
+        // Now that the description is loaded, register a click listener inside
+        // the document of the iframe.
+        //
+        viewer.infoBox.frame.contentDocument.body.addEventListener('click', function (e) {
+            //
+            // The document body will be rewritten when the selectedEntity changes,
+            // but this body listener will survive.  Now it must determine if it was
+            // one of the clickable buttons.
+            //
+            if (e.target && e.target.className === 'btn btn-default btn-sm') {
+                console.log(e);
+                // window.location.replace("http://www.google.com");
+            }
+        }, false);
+    }, false);
+    for (var i = 0; i < peaks.length; i++) {
+        viewer.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(peaks[i].longitude, peaks[i].latitude, peaks[i].altitude * 3),
+            billboard: {
+                image: hashMapIcons[peaks[i].color].options.iconUrl,
+                show: true,
+                scale: 0.8,
+                customId: i
+                // imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
+                // color : Cesium.Color.LIME
+            },
+            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button type='button' class='btn btn-default btn-sm'" +
+            "onclick=\"window.location.href='/peaks/" + peaks[i].id + "'\">" +
+            "Details </button>",
+            name: "Peak " + peaks[i].name,
+            id: "label_" + i
+        });
+    }
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    handler.setInputAction(function (movement) {
+        var pick = viewer.scene.pick(movement.position);
+        if (Cesium.defined(pick)) {
+            var markerObjectId = pick.customId;
+            var idString = pick.id;
+            console.log(idString);
+            viewer.infoBox.viewModel.showInfo = false;
+            viewer.infoBox.viewModel.closeClicked.addEventListener(function () {
+                onClickOverMarker(markerObjectId)
+            });
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+    viewer.camera.setView({
+        destination: new Cesium.Cartesian3.fromDegrees(peaks[0].longitude, peaks[0].latitude, peaks[0].altitude * 3),
+        // orientation : {
+        //     heading : 4.731089976107251,
+        //     pitch : -0.32003481981370063
+        // }
+    });
+
+    var toolbar = document.getElementById('toolbar');
+
+    function updateDisplay(stringToUpdate) {
+        toolbar.innerHTML = 'Number of times you clicked either button:';
+    }
+
+
+    /*]]>*/
+
+</script>
+
+</body>
+</html>

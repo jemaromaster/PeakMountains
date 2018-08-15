@@ -165,7 +165,7 @@ public class CampaignLogic {
         } else if (!campaignToUploadFile.getStatus().equals("started")) {
             throw new RuntimeException("The campaign should be in STATUS:STARTED to upload a file.");
         }
-        ;
+
 
         try {
             storageService.store(file, fileName);
