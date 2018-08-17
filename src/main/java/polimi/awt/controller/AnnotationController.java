@@ -130,6 +130,7 @@ public class AnnotationController {
     public ModelAndView peakAnnotate(@ModelAttribute(name = "annotation") Annotation annotation,
                                @RequestParam(name = "peakId", required = true) Long peakId,
                                Model model, RedirectAttributes redir) {
+
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
 
