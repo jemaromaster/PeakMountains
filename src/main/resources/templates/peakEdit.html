@@ -135,29 +135,35 @@
                                                                    width="100%">
                                                                 <thead>
                                                                 <tr>
-                                                                    <th >Id</th>
-                                                                    <th>Name</th>
-                                                                    <th>Lang</th>
-                                                                    <th></th>
+                                                                    <th class="col-md-1 col-sm-1">Id</th>
+                                                                    <th class="col-md-8 col-sm-8">Name</th>
+                                                                    <th class="col-md-2 col-sm-2">Lang</th>
+                                                                    <th class="col-md-1 col-sm-1"></th>
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                 <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
                                                                 <tr th:each="row,rowStat : *{localizedNames}">
                                                                     <td th:text="${rowStat.count}"></td>
-                                                                    <td th:field="*{localizedNames[__${rowStat.index}__].name}" th:text="*{localizedNames[__${rowStat.index}__].name}" ></td>
-                                                                    <td th:field="*{rowlocalizedNamess[__${rowStat.index}__].lang}" th:text="*{localizedNames[__${rowStat.index}__].lang}"></td>
+                                                                    <td><input type="text"
+                                                                               class="col-md-12 col-sm-12"
+                                                                               th:field="*{localizedNames[__${rowStat.index}__].name}"/>
+                                                                    </td>
+                                                                    <!--<td><input th:field="*{localizedNames[__${rowStat.index}__].lang}"/></td>-->
+
+                                                                    <td><select required="required"
+                                                                                class="form-control col-sm-6 col-md-6 col-xs-2"
+                                                                                th:field="*{localizedNames[__${rowStat.index}__].lang}"
+                                                                    >
+                                                                        <option value="0">[Choose option]</option>
+                                                                        <option value="en">EN</option>
+                                                                        <option value="es">ES</option>
+                                                                        <option value="de">DE</option>
+                                                                        <option value="it">IT</option>
+                                                                        <option value="sl">SL</option>
+                                                                    </select>
+                                                                    </td>
                                                                     <td>
-                                                                        <!--th:action="@{~/annotations/{annotationId}(annotationId=${camp.id})}"-->
-                                                                        <!--method="get"-->
-                                                                        <!--<button type="button"-->
-                                                                        <!--class="btn btn-default btn-xs"-->
-                                                                        <!--data-toggle="modal"-->
-                                                                        <!--data-target="#modalPeakDetails"-->
-                                                                        <!--th:onclick="'getAnnotationDetails(' + ${ln.id} + ');'"-->
-                                                                        <!--&gt;-->
-                                                                        <!--<i class="fa fa-eye"></i> View-->
-                                                                        <!--</button>-->
 
                                                                         <button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames"
                                                                                 type="button"
@@ -166,9 +172,6 @@
                                                                                 class="fa fa-trash"></i>
                                                                         </button>
 
-                                                                        <!--<button type="button" class="btn btn-default btn-xs">-->
-                                                                        <!--<i class="fa fa-times"></i> Reject-->
-                                                                        <!--</button>-->
                                                                     </td>
                                                                 </tr>
                                                                 </tbody>
@@ -181,9 +184,8 @@
                                                         <div class="row">
                                                             <div class="btn-group btn-group-sm">
                                                                 <button class="btn btn-default" type="button"
-                                                                        id="btnAddLN"
-                                                                        data-toggle="modal"
-                                                                        data-target="#modalAddLocalizedName"><i
+                                                                        id="btnAddOptionToSelect"
+                                                                ><i
                                                                         class="fa fa-plus"></i> Add
                                                                 </button>
                                                             </div>
@@ -251,7 +253,7 @@
                                                     <button type="button" class="btn btn-default btn-sm"
                                                             data-dismiss="modal">Cancel
                                                     </button>
-                                                    <button type="button" id="btnAddOptionToSelect"
+                                                    <button type="button"
                                                             class="btn btn-primary btn-sm">Add
                                                     </button>
                                                 </div>
@@ -349,42 +351,42 @@
 
     //to remove the row from the table
     $(document).on('click', 'button.removebuttonlocalizednames', function () {
-        alert("aa");
         $(this).closest('tr').remove();
         return false;
     });
 
     $('#btnAddOptionToSelect').click(function () {
-        var newLocalizedName = $.trim($('#inputNewLocalizedNames').val());
-        var lang = $('#selectLangOption').find(":selected").val();
-        var rowCount = $('#localizedNamesTable tr').length;
+        // var newLocalizedName = $.trim($('#inputNewLocalizedNames').val());
+        // var lang = $('#selectLangOption').find(":selected").val();
+        var rowCount = +$('#localizedNamesTable tr').length -1;
+        var rowCountPlusOne = +rowCount +1;
 
-        console.log(newLocalizedName, lang);
-        if (newLocalizedName.length == 0) {
-            $('#inputNewLocalizedNames').attr('for', 'inputWarning');
-        } else if (lang == 0) {
-            $('#selectLangOption').attr('for', 'inputWarning');
-        } else {
-            //set value to null
-            $('#inputNewLocalizedNames').val('');
-            $("#selectLangOption").val($("#selectLangOption option:first").val());
-            var trString = '<tr>' +
-                '<td>' + rowCount + '</td>'+
-            '<td> ' + newLocalizedName + '</td>'+
-            '<td>' + lang + '</td>' +
-            '<td>' +
-            '<button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames" type="button"' +
+        console.log(rowCount);
+        //set value to null
+        // $('#inputNewLocalizedNames').val('');
+        $("#selectLangOption").val($("#selectLangOption option:first").val());
+        var trString = '<tr>' +
+            '<td>' + rowCountPlusOne + '</td>' +
+            '<td> <input type="text" class="col-md-12 col-sm-12" id="localizedNames' + rowCount + '.name" name="localizedNames[' + rowCount + '].name"/></td>' +
+            '<td><select required="required" id="localizedNames'+ rowCount + '.lang" ' + ' name="localizedNames[' + rowCount + '].lang"' +
+            '        class="form-control col-sm-6 col-md-6 col-xs-2"' +
+            '            >' +
+            '                <option value="0" selected="selected">[Choose option]</option>\n' +
+            '                <option value="en">EN</option>\n' +
+            '                <option value="es">ES</option>\n' +
+            '                <option value="de">DE</option>\n' +
+            '                <option value="it">IT</option>' +
+            '                <option value="sl">SL</option>' +
+            '</select>' +
+            '</td>' +
+            '<td><button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames" type="button"' +
             'id="btnDeleteLN"' +
             ' ><i class="fa fa-trash"></i>' +
             '</button>' +
             '</td>' +
             '</tr>';
 
-            alert(trString);
-            $('#localizedNamesTable tr:last').after(trString);
-
-            $('#modalAddLocalizedName').modal('toggle');
-        }
+        $('#localizedNamesTable tr:last').after(trString);
     });
 
     var jsonPeak = JSON.parse(peakString);

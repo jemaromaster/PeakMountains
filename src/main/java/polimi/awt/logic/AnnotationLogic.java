@@ -83,10 +83,17 @@ public class AnnotationLogic {
 
         List<AlternativePeakAnnotationName> list = annotation.getLocalizedNames();
         Annotation annotationToReturn = annotationRepository.save(annotation);
-        if (list != null) {
+        if (list != null && list.size() > 0) {
             for (AlternativePeakAnnotationName an : list) {
-                an.setAnnotation(annotationToReturn);
-                nameForAnnotationRepository.save(an);
+//                check for annotation, if they are empty
+                if (an.getName() != null) {
+                    an.setAnnotation(annotationToReturn);
+                    if (an.getName() != null && an.getName().trim().equals(""))break; else
+                    an.setName(an.getName().trim());
+                    if (an.getLang() != null && an.getLang().trim().equals("")) break;
+                    else an.setLang(an.getLang().trim());
+                    nameForAnnotationRepository.save(an);
+                }
             }
         }
 

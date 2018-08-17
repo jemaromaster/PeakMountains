@@ -1,7 +1,5 @@
 package polimi.awt.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -113,11 +111,6 @@ public class AnnotationController {
         model.addAttribute("annotation", ann);
         model.addAttribute("peak", peak);
 
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-        String jsonListLocalizedNames = gson.toJson(ann.getLocalizedNames());
-
-        model.addAttribute("listLocalizedNames", jsonListLocalizedNames);
-
         // for worker profile
         if (rolInSession.equals("worker")) {
             if (campaignLogic.isWorkerSubscribedToCampaign(peak.getCampaign(), userInSession)) {
@@ -134,22 +127,25 @@ public class AnnotationController {
     }
 
     @PostMapping("/annotations")
-    public String peakAnnotate(@ModelAttribute(name = "annotation") Annotation annotation,
+    public ModelAndView peakAnnotate(@ModelAttribute(name = "annotation") Annotation annotation,
                                @RequestParam(name = "peakId", required = true) Long peakId,
-                               Model model) {
+                               Model model, RedirectAttributes redir) {
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
 
         try {
             annotationLogic.createAnnotation(annotation, peakId);
             message = new Message("Success", "Annotation created successfully");
+            model.addAttribute("message", message);
         } catch (Exception e) {
             e.printStackTrace();
             message = new Message("Warning", e.getMessage());
             model.addAttribute("message", message);
-            return "redirect:home";
         }
 
-        return "redirect:home";
+        modelAndView.setViewName("redirect:home");
+        //in order to redirect to a previous page, and add a message
+        redir.addFlashAttribute("message", message);
+        return modelAndView;
     }
 }
