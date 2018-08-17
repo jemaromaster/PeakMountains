@@ -57,7 +57,6 @@ public class Peak {
     @Expose
     private Boolean conflicts=false;
 
-
     public long getId() {
         return id;
     }
@@ -148,10 +147,9 @@ public class Peak {
         this.positivePeaksValidity = this.positivePeaksValidity + 1l ;
     }
 
-    public Boolean  checkConflict(){
+    public Boolean checkConflict(){
         if (this.positivePeaksValidity>0 && this.negativePeaksValidity>0){
             this.conflicts=true;
-
         }else
             this.conflicts=false;
 
@@ -173,4 +171,5 @@ public class Peak {
     public void setConflicts(Boolean conflicts) {
         this.conflicts = conflicts;
     }
+
 }

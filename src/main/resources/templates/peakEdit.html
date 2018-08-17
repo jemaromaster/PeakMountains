@@ -78,125 +78,127 @@
                                                   th:action="@{/annotations(peakId=${peak.id})}"
                                                   th:object="${annotation}" method="post"
                                             >
+                                                <fieldset th:disabled="${toReadOnly}">
 
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Is a valid
-                                                        peak?</label>
-                                                    <div class="col-md-9 col-sm-9 col-xs-12">
-                                                        <div id="inputEditValid" class="radio">
-                                                            <label>
-                                                                <input type="radio" class="flat" checked="checked"
-                                                                       name="iCheck" th:value="${true}"
-                                                                       th:field="*{peakValidity}"/>
-                                                                Valid
-                                                            </label>
-                                                            <label>
-                                                                <input type="radio" class="flat" th:value="${false}"
-                                                                       name="iCheck" th:field="*{peakValidity}"/>
-                                                                Invalid
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
-                                                    <div class="col-md-9 col-sm-9 col-xs-12">
-                                                        <input type="text"
-                                                               class="form-control col-md-10" th:field="*{name}"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Location:</label>
-                                                    <div class="col-md-9 col-sm-9 col-xs-12">
-                                                        <input readonly="readonly" type="text"
-                                                               class="form-control col-md-10"
-                                                               th:value="'[' + ${peak.longitude} + ', ' + ${peak.latitude} + ']'"
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude:</label>
-                                                    <div class="col-md-9 col-sm-9 col-xs-12">
-                                                        <input type="text"
-                                                               class="form-control col-md-10"
-                                                               th:field="*{elevation}"/>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Localized
-                                                        Names:</label>
-                                                    <div class="x_content col-md-9 col-sm-9 col-xs-12">
-                                                        <div class="title_right">
-                                                            <table class="table table-striped"
-                                                                   id="localizedNamesTable"
-                                                                   cellspacing="0"
-                                                                   width="100%">
-                                                                <thead>
-                                                                <tr>
-                                                                    <th class="col-md-1 col-sm-1">Id</th>
-                                                                    <th class="col-md-8 col-sm-8">Name</th>
-                                                                    <th class="col-md-2 col-sm-2">Lang</th>
-                                                                    <th class="col-md-1 col-sm-1"></th>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
-                                                                <tr th:each="row,rowStat : *{localizedNames}">
-                                                                    <td th:text="${rowStat.count}"></td>
-                                                                    <td><input type="text"
-                                                                               class="col-md-12 col-sm-12"
-                                                                               th:field="*{localizedNames[__${rowStat.index}__].name}"/>
-                                                                    </td>
-                                                                    <!--<td><input th:field="*{localizedNames[__${rowStat.index}__].lang}"/></td>-->
-
-                                                                    <td><select required="required"
-                                                                                class="form-control col-sm-6 col-md-6 col-xs-2"
-                                                                                th:field="*{localizedNames[__${rowStat.index}__].lang}"
-                                                                    >
-                                                                        <option value="0">[Choose option]</option>
-                                                                        <option value="en">EN</option>
-                                                                        <option value="es">ES</option>
-                                                                        <option value="de">DE</option>
-                                                                        <option value="it">IT</option>
-                                                                        <option value="sl">SL</option>
-                                                                    </select>
-                                                                    </td>
-                                                                    <td>
-
-                                                                        <button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames"
-                                                                                type="button"
-                                                                                id="btnDeleteLN"
-                                                                        ><i
-                                                                                class="fa fa-trash"></i>
-                                                                        </button>
-
-                                                                    </td>
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="x_content col-md-2 col-md-offset-10 col-sm-2 col-sm-offset-10 col-xs-3">
-                                                        <div class="row">
-                                                            <div class="btn-group btn-group-sm">
-                                                                <button class="btn btn-default" type="button"
-                                                                        id="btnAddOptionToSelect"
-                                                                ><i
-                                                                        class="fa fa-plus"></i> Add
-                                                                </button>
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Is a
+                                                            valid
+                                                            peak?</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <div id="inputEditValid" class="radio">
+                                                                <label>
+                                                                    <input type="radio" class="flat" checked="checked"
+                                                                           name="iCheck" th:value="${true}"
+                                                                           th:field="*{peakValidity}"/>
+                                                                    Valid
+                                                                </label>
+                                                                <label>
+                                                                    <input type="radio" class="flat" th:value="${false}"
+                                                                           name="iCheck" th:field="*{peakValidity}"/>
+                                                                    Invalid
+                                                                </label>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Name:</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <input type="text"
+                                                                   class="form-control col-md-10" th:field="*{name}"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Location:</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <input readonly="readonly" type="text"
+                                                                   class="form-control col-md-10"
+                                                                   th:value="'[' + ${peak.longitude} + ', ' + ${peak.latitude} + ']'"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude:</label>
+                                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                                            <input type="text"
+                                                                   class="form-control col-md-10"
+                                                                   th:field="*{elevation}"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="control-label col-md-3 col-sm-3 col-xs-12">Localized
+                                                            Names:</label>
+                                                        <div class="x_content col-md-9 col-sm-9 col-xs-12">
+                                                            <div class="title_right">
+                                                                <table class="table table-striped"
+                                                                       id="localizedNamesTable"
+                                                                       cellspacing="0"
+                                                                       width="100%">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th class="col-md-1 col-sm-1">Id</th>
+                                                                        <th class="col-md-8 col-sm-8">Name</th>
+                                                                        <th class="col-md-2 col-sm-2">Lang</th>
+                                                                        <th class="col-md-1 col-sm-1"></th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <!--/*@thymesVar id="camp" type="polimi.awt.model.Campaign"*/-->
+                                                                    <tr th:each="row,rowStat : *{localizedNames}">
+                                                                        <td th:text="${rowStat.count}"></td>
+                                                                        <td><input type="text"
+                                                                                   class="col-md-12 col-sm-12"
+                                                                                   th:field="*{localizedNames[__${rowStat.index}__].name}"/>
+                                                                        </td>
+                                                                        <!--<td><input th:field="*{localizedNames[__${rowStat.index}__].lang}"/></td>-->
+
+                                                                        <td><select required="required"
+                                                                                    class="form-control col-sm-6 col-md-6 col-xs-2"
+                                                                                    th:field="*{localizedNames[__${rowStat.index}__].lang}"
+                                                                        >
+                                                                            <option value="0">[Choose option]</option>
+                                                                            <option value="en">EN</option>
+                                                                            <option value="es">ES</option>
+                                                                            <option value="de">DE</option>
+                                                                            <option value="it">IT</option>
+                                                                            <option value="sl">SL</option>
+                                                                        </select>
+                                                                        </td>
+                                                                        <td>
+
+                                                                            <button class="btn btn-default btn-xs btn-danger removebuttonlocalizednames"
+                                                                                    type="button"
+                                                                                    id="btnDeleteLN"
+                                                                            ><i
+                                                                                    class="fa fa-trash"></i>
+                                                                            </button>
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" th:hidden="${toReadOnly}">
+                                                        <div class="x_content col-md-2 col-md-offset-10 col-sm-2 col-sm-offset-10 col-xs-3">
+                                                            <div class="row">
+                                                                <div class="btn-group btn-group-sm">
+                                                                    <button class="btn btn-default" type="button"
+                                                                            id="btnAddOptionToSelect"
+                                                                    ><i
+                                                                            class="fa fa-plus"></i> Add
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
 
                                                 <div class="ln_solid"></div>
 
-                                                <div class="form-group">
+                                                <div class="form-group" th:hidden="${toReadOnly}">
                                                     <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                                                         <button class="btn btn-primary" onclick="history.back(-1)"
                                                                 type="button">Cancel
@@ -358,8 +360,8 @@
     $('#btnAddOptionToSelect').click(function () {
         // var newLocalizedName = $.trim($('#inputNewLocalizedNames').val());
         // var lang = $('#selectLangOption').find(":selected").val();
-        var rowCount = +$('#localizedNamesTable tr').length -1;
-        var rowCountPlusOne = +rowCount +1;
+        var rowCount = +$('#localizedNamesTable tr').length - 1;
+        var rowCountPlusOne = +rowCount + 1;
 
         console.log(rowCount);
         //set value to null
@@ -368,7 +370,7 @@
         var trString = '<tr>' +
             '<td>' + rowCountPlusOne + '</td>' +
             '<td> <input type="text" class="col-md-12 col-sm-12" id="localizedNames' + rowCount + '.name" name="localizedNames[' + rowCount + '].name"/></td>' +
-            '<td><select required="required" id="localizedNames'+ rowCount + '.lang" ' + ' name="localizedNames[' + rowCount + '].lang"' +
+            '<td><select required="required" id="localizedNames' + rowCount + '.lang" ' + ' name="localizedNames[' + rowCount + '].lang"' +
             '        class="form-control col-sm-6 col-md-6 col-xs-2"' +
             '            >' +
             '                <option value="0" selected="selected">[Choose option]</option>\n' +

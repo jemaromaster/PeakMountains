@@ -68,6 +68,10 @@ public class AnnotationLogic {
             throw new RuntimeException("You are not suscribed to this campaign.");
         }
 
+        if (this.isAnnotatedByUser(peak, userFromSession)){
+            throw new RuntimeException("You have already annotated this peak. A peak can be annotated only once per user.");
+        }
+
         //controls if the campaign name is not empty
         String name = annotation.getName().trim();
         if (name != null) {
@@ -206,6 +210,11 @@ public class AnnotationLogic {
 
     public Annotation findAnnotationById(Long findById) {
         return annotationRepository.findAnnotationById(findById);
+    }
+
+    public Boolean isAnnotatedByUser(Peak peak, UserPV user){
+        List<Annotation> p = annotationRepository.findAnnotationByPeakAndUserPV(peak,user);
+        return p.size()>0;
     }
 
 }

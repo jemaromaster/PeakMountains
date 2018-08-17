@@ -93,7 +93,7 @@ public class AnnotationController {
 
     //peak details
     @GetMapping("/peaks/{peakId}/annotate")
-    public String peakEdit(@PathVariable Long peakId, Model model) {
+    public String annotatePeak(@PathVariable Long peakId, Model model) {
         Peak peak = peakLogic.findPeakById(peakId);
         Page<Annotation> annotations = annotationLogic.findAnnotationByPeak(peakId, 0, 100);
 
@@ -101,14 +101,17 @@ public class AnnotationController {
         UserPV userInSession = utils.getUserFromSession();
         String rolInSession = utils.getRolUserInSession();
 
+        Boolean alreadyAnnotated = false;
         if (annotations.getTotalElements() == 0l) {
             ann = annotationLogic.createAnnotationByPeak(peak, userInSession);
         } else {
             ann = annotations.getContent().get(0);
+            alreadyAnnotated = true;
         }
 
         ModelAndView modelAndView = new ModelAndView();
         model.addAttribute("annotation", ann);
+        model.addAttribute("toReadOnly", alreadyAnnotated);
         model.addAttribute("peak", peak);
 
         // for worker profile

@@ -362,6 +362,12 @@
                                                         >
                                                             <i class="fa fa-compass"></i>&nbsp;Annotate Peak
                                                         </button>
+
+                                                        <button id="viewAnnotationDetails" type="button"
+                                                                class="btn btn-default btn-sm" hidden="true"
+                                                        >
+                                                            <i class="fa fa-eye"></i>&nbsp;Check annotation
+                                                        </button>
                                                     </div>
                                                 </div>
 
@@ -495,6 +501,9 @@
         var isSuscribedCamp = /*[[${isSuscribedToCampaign}]]*/'false';
 
         $('#infoPeakNotSelected').hide();
+
+        $('#viewAnnotationDetails').hide()
+        $('#inputPeakButtonAnnotate').html('<i class="fa fa-compass"></i>&nbsp;Annotate Peak');
         $('#formPeakSelected').show();
 
         $('#inputPeakName').val(peakInfo['name']);
@@ -506,7 +515,31 @@
 
         //we set to true or false to be annotate
         $('#inputPeakButtonAnnotate').prop('disabled', !(peakInfo['toBeAnnotated'] && isSuscribedCamp == true));
-        $('#inputPeakButtonAnnotate').on("click", function (){ window.location.href="/peaks/"+ peakInfo.id + "/annotate"});
+        $('#inputPeakButtonAnnotate').on("click", function () {
+            window.location.href = "/peaks/" + peakInfo.id + "/annotate"
+        });
+
+        if (!($('#inputPeakButtonAnnotate').prop('disabled'))) {
+            var url = window.location.href;
+            var arr = url.split("/");
+            var current = arr[0]
+            $.ajax({
+                type: "GET",
+                url: current + '/peaks/' + peakInfo.id + '/isAnnotatedByUser',
+                success: function (data) {
+                    if (data) { //if it was already annotated
+                        $('#inputPeakButtonAnnotate').prop('disabled',true);
+                        $('#inputPeakButtonAnnotate').html('<i class="fa fa-compass"></i>&nbsp;Already annotated');
+                        $('#viewAnnotationDetails').show();
+                        $('#viewAnnotationDetails').on("click", function () {
+                            window.location.href = "/peaks/" + peakInfo.id + "/annotate"
+                        });
+                    }
+                },
+                error: function () {
+                }
+            });
+        }
 
         $('#inputPeakLocalizedNames').find('option').remove().end();
         if (peakInfo['localizedNames'].length > 0) {
@@ -514,7 +547,7 @@
             arrayLN.forEach(function (ln) {
                 $('#inputPeakLocalizedNames').append($('<option>', {
                     value: ln['id'],
-                    text: ln['name']+ (ln['lang']!=null ? ' [' + ln['lang'].toUpperCase() + ']' : '')
+                    text: ln['name'] + (ln['lang'] != null ? ' [' + ln['lang'].toUpperCase() + ']' : '')
                 }));
             });
         } else {

@@ -5,8 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import polimi.awt.Utils;
+import polimi.awt.logic.AnnotationLogic;
 import polimi.awt.logic.PeakLogic;
 import polimi.awt.model.Peak;
+import polimi.awt.model.UserPV;
 
 @RestController
 @RequestMapping("peaks")
@@ -14,6 +17,12 @@ public class PeakControllerREST {
 
     @Autowired
     PeakLogic peakLogic;
+
+    @Autowired
+    AnnotationLogic annotationLogic;
+
+    @Autowired
+    Utils utils;
 
 
     @GetMapping(produces = "application/json")
@@ -37,6 +46,14 @@ public class PeakControllerREST {
     public Peak getPeakById(@PathVariable Long peakId) {
         Peak peakFound = peakLogic.findPeakById(peakId);
         return peakFound;
+    }
+
+    @GetMapping(value = "/{peakId}/isAnnotatedByUser", produces = "application/json")
+    public Boolean isPeakAnnotatedByUser(@PathVariable Long peakId) {
+        Peak peak = peakLogic.findPeakById(peakId);
+        UserPV getUserFromSession = utils.getUserFromSession();
+        Boolean toR = annotationLogic.isAnnotatedByUser(peak, getUserFromSession);
+        return toR;
     }
 
 }
