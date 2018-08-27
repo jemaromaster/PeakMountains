@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.servlet.ModelAndView;
 import polimi.awt.Utils;
 import polimi.awt.logic.AnnotationLogic;
 import polimi.awt.logic.CampaignLogic;
@@ -42,7 +41,6 @@ public class PeakController {
     public String peakDetails(@PathVariable Long peakId, Model model) {
         Peak peak = peakLogic.findPeakById(peakId);
         Page<Annotation> annotations = annotationLogic.findAnnotationByPeak(peakId, 0, 100);
-        ModelAndView modelAndView = new ModelAndView();
         model.addAttribute("peak", peak);
 
         //for the manager profile

@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import polimi.awt.Utils;
+import polimi.awt.logic.AnnotationLogic;
 import polimi.awt.logic.CampaignLogic;
 import polimi.awt.logic.PeakLogic;
 import polimi.awt.logic.UserLogic;
@@ -35,6 +36,9 @@ public class CampaignController {
 
     @Autowired
     PeakLogic peakLogic;
+
+    @Autowired
+    AnnotationLogic annotationLogic;
 
     @Autowired
     UserLogic userLogic;
@@ -165,7 +169,7 @@ public class CampaignController {
         //in case that the user tries to access the url without the manager privilege over the campaign
         UserPV userInSession = utils.getUserFromSession();
         if (campaign.getUsrManager().getId() != userInSession.getId()) {
-            redirectAttributes.addFlashAttribute("message", new Message("Warning", "Only the campaign manager visualize the statistics in a campaign"));
+            redirectAttributes.addFlashAttribute("message", new Message("Warning", "Only the campaign manager can visualize the statistics in a campaign"));
             modelAndView.setViewName("redirect:/home");
             return modelAndView;
         }
@@ -173,6 +177,16 @@ public class CampaignController {
         Statistics stat = campaignLogic.getStatistics(campaign);
         model.addAttribute(campaign);
         model.addAttribute("statistics", stat);
+
+        Page<Peak> annotatedPeaks = peakLogic.findPeakByCampaignAndColor(campaign, "orange", 0, 100);
+        model.addAttribute("annotatedPeaks", annotatedPeaks.getContent());
+
+        Page<Peak> rejectedPeaks = peakLogic.findPeakByCampaignAndColor(campaign, "red", 0, 100);
+        model.addAttribute("rejectedPeaks", rejectedPeaks.getContent());
+
+        Page<Peak> conflictPeaks = peakLogic.findPeakByCampaignAndConflicts(campaign, true, 0, 100);
+        model.addAttribute("conflictPeaks", conflictPeaks.getContent());
+
         modelAndView.setViewName("/campaignStatistics");
 
         return modelAndView;

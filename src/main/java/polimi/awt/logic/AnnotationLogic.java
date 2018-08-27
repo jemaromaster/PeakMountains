@@ -68,6 +68,10 @@ public class AnnotationLogic {
             throw new RuntimeException("You are not suscribed to this campaign.");
         }
 
+        if (peak.getToBeAnnotated() == false) {
+            throw new RuntimeException("Peak with id " + peakId + " is not able for annotation");
+        }
+
         if (this.isAnnotatedByUser(peak, userFromSession)){
             throw new RuntimeException("You have already annotated this peak. A peak can be annotated only once per user.");
         }
@@ -101,11 +105,18 @@ public class AnnotationLogic {
             }
         }
 
+        //maintain color
+        if (peak.getColor().equals("yellow") || peak.getColor().equals("orange")){ //the first one or after the first one
+            peak.setColor("orange");
+        }else if(peak.getColor().equals("red")){ //it has one reject annotation
+            peak.setColor("red");
+        }
+
         //maintain number statistics in peak
         if (annotation.getPeakValidity()) {
             peak.addPositivePeaksValidity();
         } else {
-            peak.addPositivePeaksValidity();
+            peak.addNegativePeaksValidity();
         }
         peak.checkConflict(); //update the conflict state
 
@@ -201,6 +212,10 @@ public class AnnotationLogic {
         return annotationRepository.findAnnotationByPeak(peak, new PageRequest(page, size));
     }
 
+    public List<Annotation> findAnnotationByPeakAndUser(Peak peak, UserPV userPV) {
+        return annotationRepository.findAnnotationByPeakAndUserPV(peak,userPV);
+    }
+
     public Annotation createAnnotationByPeak(Peak peak, UserPV userPV) {
         //we get the user from the session
         Annotation ann = new Annotation(peak, userPV);
@@ -216,5 +231,6 @@ public class AnnotationLogic {
         List<Annotation> p = annotationRepository.findAnnotationByPeakAndUserPV(peak,user);
         return p.size()>0;
     }
+
 
 }

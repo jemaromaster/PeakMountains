@@ -32,7 +32,7 @@ public class PeakLogic {
 
     public Page<Peak> findPeakByCampaign(Long campaignId, Integer page, Integer size) {
         Campaign campaign = campaignRepository.findCampaignById(campaignId);
-        if (campaign==null){
+        if (campaign == null) {
             throw new RuntimeException("Campaign " + campaignId + " not found");
         }
         return peakRepository.findPeakByCampaignAndAltitudeIsNotNullOrderByAltitudeDesc(campaign, new PageRequest(page, size));
@@ -42,6 +42,19 @@ public class PeakLogic {
         //we get the user from the session
         Peak peak = peakRepository.findPeakByIdEquals(findById);
         return peak;
+    }
+
+
+    public Page<Peak> findPeakByCampaignAndColor(Campaign campaign, String color, Integer page, Integer size) {
+        //we get the user from the session
+        Page<Peak> peaks = peakRepository.findPeakByCampaignAndColor(campaign, color, new PageRequest(page, size));
+        return peaks;
+    }
+
+    public Page<Peak> findPeakByCampaignAndConflicts(Campaign campaign, Boolean b, Integer page, Integer size) {
+        //we get the user from the session
+        Page<Peak> peaks = peakRepository.findPeakByCampaignAndConflicts(campaign, b, new PageRequest(page, size));
+        return peaks;
     }
 
 }

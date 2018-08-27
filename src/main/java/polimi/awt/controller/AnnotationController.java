@@ -1,7 +1,6 @@
 package polimi.awt.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,8 @@ import polimi.awt.model.Annotation;
 import polimi.awt.model.Peak;
 import polimi.awt.model.UserPV;
 import polimi.awt.utils.Message;
+
+import java.util.List;
 
 @Controller
 public class AnnotationController {
@@ -93,19 +94,19 @@ public class AnnotationController {
 
     //peak details
     @GetMapping("/peaks/{peakId}/annotate")
-    public String annotatePeak(@PathVariable Long peakId, Model model) {
+    public String annotatePeak(@PathVariable Long peakId, Model model, RedirectAttributes redir) {
         Peak peak = peakLogic.findPeakById(peakId);
-        Page<Annotation> annotations = annotationLogic.findAnnotationByPeak(peakId, 0, 100);
 
         Annotation ann = null;
         UserPV userInSession = utils.getUserFromSession();
         String rolInSession = utils.getRolUserInSession();
+        List<Annotation> annotations = annotationLogic.findAnnotationByPeakAndUser(peak, userInSession);
 
         Boolean alreadyAnnotated = false;
-        if (annotations.getTotalElements() == 0l) {
+        if (annotations.size() == 0) {
             ann = annotationLogic.createAnnotationByPeak(peak, userInSession);
         } else {
-            ann = annotations.getContent().get(0);
+            ann = annotations.get(0);
             alreadyAnnotated = true;
         }
 
@@ -120,9 +121,10 @@ public class AnnotationController {
                 model.addAttribute("isSuscribedToCampaign", true);
             } else {
                 model.addAttribute("isSuscribedToCampaign", false);
-                Message message = new Message("Warning", "You are not subscribed to this campaign. To start adding annotations, you must subscribe to it first!");
-                model.addAttribute("message", message);
-                return "/home";
+                Message message = new Message("Warning", "You are not subscribed to the campaign " + peak.getCampaign().getName() +
+                        ". To start adding annotations to the campaign " + peak.getCampaign().getName() + ", you must subscribe to it first!");
+                redir.addFlashAttribute("message", message);
+                return "redirect:/home";
             }
         }
 
@@ -131,8 +133,8 @@ public class AnnotationController {
 
     @PostMapping("/annotations")
     public ModelAndView peakAnnotate(@ModelAttribute(name = "annotation") Annotation annotation,
-                               @RequestParam(name = "peakId", required = true) Long peakId,
-                               Model model, RedirectAttributes redir) {
+                                     @RequestParam(name = "peakId", required = true) Long peakId,
+                                     Model model, RedirectAttributes redir) {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();

@@ -87,13 +87,13 @@
                                                         <div class="col-md-9 col-sm-9 col-xs-12">
                                                             <div id="inputEditValid" class="radio">
                                                                 <label>
-                                                                    <input type="radio" class="flat" checked="checked"
+                                                                    <input type="radio" class="flat" checked="checked" th:disabled="${toReadOnly}"
                                                                            name="iCheck" th:value="${true}"
                                                                            th:field="*{peakValidity}"/>
                                                                     Valid
                                                                 </label>
                                                                 <label>
-                                                                    <input type="radio" class="flat" th:value="${false}"
+                                                                    <input type="radio" class="flat" th:value="${false}" th:disabled="${toReadOnly}"
                                                                            name="iCheck" th:field="*{peakValidity}"/>
                                                                     Invalid
                                                                 </label>

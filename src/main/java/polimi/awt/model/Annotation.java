@@ -74,8 +74,8 @@ public class Annotation {
         List<AlternativePeakAnnotationName> alternativePeakAnnotationNames = new ArrayList<>();
         for (AlternativePeakName a: lnP){
             AlternativePeakAnnotationName aAnnName = new AlternativePeakAnnotationName();
-            aAnnName.setName(a.getLang());
-            aAnnName.setLang(a.getName());
+            aAnnName.setName(a.getName());
+            aAnnName.setLang(a.getLang());
             alternativePeakAnnotationNames.add(aAnnName);
         }
         this.localizedNames = alternativePeakAnnotationNames;

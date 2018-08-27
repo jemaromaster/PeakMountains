@@ -340,7 +340,9 @@ public class CampaignLogic {
         stat.setPeaksAnnotated(new BigDecimal(peaksAnnotated + peaksReject));
 
         //total number of conflicts
-        //define number of conflicts
+        //count the campaign by the conflicts true
+        Long peaksConflicts = peakRepository.countPeakByCampaignAndConflicts(campaign, true);
+        stat.setConflicts(new BigDecimal(peaksConflicts));
 
         return stat;
     }
