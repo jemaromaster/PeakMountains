@@ -61,6 +61,10 @@ public class PeakController {
             }
         }
 
+        if (peak.getConflicts()){
+            Message message = new Message("WarningRed", "This peak has CONFLICTS among their annotations.");
+            model.addAttribute("message", message);
+        }
         //we first serialize the peak to a JSON
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String peakJson = gson.toJson(peak);

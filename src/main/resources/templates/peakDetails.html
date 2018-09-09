@@ -63,7 +63,8 @@
                                      th:if="${#authentication.getPrincipal().getRoleName() == 'worker'}">
 
                                     <!--th:onclick="|window.location.href='@{/campaign/{campaignId}/uploadFile(campaignId=${campaign.id})}'|"-->
-                                    <button type="button" class="btn btn-danger btn-sm" th:disabled="${!isSuscribedToCampaign}">
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                            th:disabled="${!isSuscribedToCampaign}">
                                         <i class="fa fa-compass"></i>&nbsp;Annotate
                                     </button>
                                 </div>
@@ -99,19 +100,19 @@
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
-                                                               th:value="${peak.latitude + ' meters'}"/>
+                                                               th:value="${peak.latitude}"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Longitude</label>
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Longitude:</label>
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
-                                                               th:value="${peak.longitude + ' meters'}"/>
+                                                               th:value="${peak.longitude}"/>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude</label>
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Altitude:</label>
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
@@ -119,7 +120,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Provenance</label>
+                                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Provenance:</label>
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
@@ -151,7 +152,7 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label class="control-label col-md-3 col-sm-3 col-xs-12">Campaign
-                                                        </label>
+                                                    </label>
                                                     <div class="col-md-9 col-sm-9 col-xs-12">
                                                         <input readonly="readonly" type="text"
                                                                class="form-control col-md-10"
@@ -163,8 +164,6 @@
 
                                     </div>
 
-
-
                                 </div>
 
                             </div>
@@ -172,8 +171,63 @@
                     </div>
                 </div>
 
+                <!-- this panel is showed if the peak has conflicts-->
+                <div class="row" th:if="${peak.conflicts == true}">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2><!--/*@thymesVar id="peak" type="polimi.awt.model.Peak"*/-->
+                                    <p></p>Conflicts
+                                </h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+
+                            <div class="x_content">
+                                <div class="title_right">
+
+                                    <div class="row top_tiles">
+                                        <div class="animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                            <div class="tile-stats">
+                                                <div class="icon"><i class="fa fa-pencil-square-o"></i></div>
+                                                <div class="count"><span
+                                                        th:text="${peak.positivePeaksValidity + peak.negativePeaksValidity}"/>
+                                                </div>
+                                                <h3>Annotations in Total</h3>
+                                                <p>Total number of annotation in this campaign</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="animated flipInY col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                            <div class="tile-stats">
+                                                <div class="icon"><i class="fa fa-check-circle-o"></i></div>
+                                                <div class="count"><span th:text="${peak.positivePeaksValidity}"/></div>
+                                                <h3>Valids</h3>
+                                                <p>Positive validity annotations</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="animated flipInY col-lg-2 col-md-2 col-sm-6 col-xs-12">
+                                            <div class="tile-stats">
+                                                <div class="icon"><i class="fa fa-times-circle-o"></i></div>
+                                                <div class="count"><span th:text="${peak.negativePeaksValidity}"/></div>
+                                                <h3>Invalids</h3>
+                                                <p>Negative validity annotations</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!--this panel is only shown to the MANAGER-->
-                <div class="row" th:if="${#authentication.getPrincipal().getRoleName() == 'manager'}">
+                <div class="row" th:if="${#authentication.getPrincipal().getRoleName() == 'manager'}"
+                     id="workerAnnotationsTable" name="workerAnnotationsTable">
                     <div class="col-md-12 col-sm-12 col-xs-12">
                         <div class="x_panel">
                             <div class="x_title">
@@ -211,13 +265,20 @@
                                             <td th:text="${camp.id}"></td>
                                             <td th:text="${camp.name}"></td>
                                             <td th:text="${camp.elevation}"></td>
-                                            <td th:text="${camp.peakValidity?'Yes':'No'}"></td>
+                                            <!--<td th:text="${camp.peakValidity?'Yes':'No'}"></td>-->
+
+                                            <td style="background-color:#3dff45" th:if="${camp.peakValidity == true}"
+                                                th:text="${camp.peakValidity?'Yes':'No'}"></td>
+                                            <td style="background-color:#f44336"
+                                                th:if="${camp.peakValidity == false}"
+                                                th:text="${camp.peakValidity?'Yes':'No'}"></td>
+
                                             <td th:text="${#calendars.format(camp.dateTimeCreated,'dd-MM-yyyy')}"></td>
                                             <td th:text="${camp.userPV.username}"></td>
-                                            <td style="background-color:#3dff45" th:if="${camp.status.equals('VALID')}"
+                                            <td th:if="${camp.status.equals('VALID')}"
                                                 th:text="${camp.status}"></td>
-                                            <td style="background-color:#f44336"
-                                                th:if="${camp.status.equals('REJECTED')}" th:text="${camp.status}"></td>
+                                            <td th:if="${camp.status.equals('REJECTED')}"
+                                                th:text="${camp.status}"></td>
                                             <td>
                                                 <!--th:action="@{~/annotations/{annotationId}(annotationId=${camp.id})}"-->
                                                 <!--method="get"-->

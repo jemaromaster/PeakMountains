@@ -401,8 +401,6 @@
             "Details </button>");
     }
 
-
-
     //MAP 3D configurations
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiMGZkYTg4MC04NDJjLTQzNmMtYTE1NC1kM2FkMTQwOTVjOTgiLCJpZCI6MjQzOSwiaWF0IjoxNTMzMjI3MTgxfQ.QtcIH_OhAiRo5eXT2zyNjNXCiYurffe4yP7l1o3ZkpI';
 
@@ -414,23 +412,7 @@
     });
 
     viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-forms allow-scripts allow-top-navigation');
-    viewer.infoBox.frame.addEventListener('load', function() {
-        //
-        // Now that the description is loaded, register a click listener inside
-        // the document of the iframe.
-        //
-        viewer.infoBox.frame.contentDocument.body.addEventListener('click', function(e) {
-            //
-            // The document body will be rewritten when the selectedEntity changes,
-            // but this body listener will survive.  Now it must determine if it was
-            // one of the clickable buttons.
-            //
-            if (e.target && e.target.className === 'btn btn-default btn-sm') {
-                console.log(e);
-                // window.location.replace("http://www.google.com");
-            }
-        }, false);
-    }, false);
+
     for (var i = 0; i < peaks.length; i++) {
         viewer.entities.add({
             position : Cesium.Cartesian3.fromDegrees(peaks[i].longitude, peaks[i].latitude, peaks[i].altitude*3),
@@ -441,12 +423,28 @@
                 // imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
                 // color : Cesium.Color.LIME
             },
-            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button type='button' class='btn btn-default btn-sm'" +
-            "onclick=\"window.location.href='/peaks/" + peaks[i].id + "'\">" +
+            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button id='button_" + i + "' type='button' class='btn btn-default btn-sm'>" +
+            // "onclick=\"window.location.href='/peaks/" + peaks[i].id
             "Details </button>",
-            name: "Peak " + peaks[i].name
+            name: "Peak " + peaks[i].name,
+            id: "label_" + i
         });
     }
+
+    var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+    handler.setInputAction(function (movement) {
+        var pick = viewer.scene.pick(movement.position);
+        if (Cesium.defined(pick)) {
+            var idString =pick.id._id.substr(6)
+            console.log("pw", idString);
+
+            //we get actual url here
+            var url = window.location.href;
+            var arr = url.split("/");
+            var result = arr[0] + "//" + arr[2]
+            window.location.href=result + "/peaks/" + peaks[idString].id
+        }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     viewer.camera.setView({
         destination : new Cesium.Cartesian3.fromDegrees(peaks[0].longitude, peaks[0].latitude, peaks[0].altitude*3),
@@ -455,13 +453,6 @@
         //     pitch : -0.32003481981370063
         // }
     });
-
-    var toolbar = document.getElementById('toolbar');
-    function updateDisplay(stringToUpdate) {
-        toolbar.innerHTML = 'Number of times you clicked either button:';
-    }
-
-
 
     /*]]>*/
 

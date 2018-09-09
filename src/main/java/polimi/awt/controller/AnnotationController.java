@@ -1,5 +1,7 @@
 package polimi.awt.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,6 +141,8 @@ public class AnnotationController {
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
 
+        Peak peakToAnnotate = peakLogic.findPeakById(peakId);
+
         try {
             annotationLogic.createAnnotation(annotation, peakId);
             message = new Message("Success", "Annotation created successfully");
@@ -149,7 +153,14 @@ public class AnnotationController {
             model.addAttribute("message", message);
         }
 
-        modelAndView.setViewName("redirect:home");
+        //redirect to campaign focusing on the peak annotated
+        modelAndView.setViewName("redirect:campaign/"+ peakToAnnotate.getCampaign().getId());
+
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+        String jsonPeak = gson.toJson(peakToAnnotate);
+
+        redir.addFlashAttribute("focusPeak", jsonPeak);
+
         //in order to redirect to a previous page, and add a message
         redir.addFlashAttribute("message", message);
         return modelAndView;

@@ -32,10 +32,6 @@
 
 <body class="nav-md">
 
-<script>
-    var showMap3d = false;
-
-</script>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">
@@ -293,7 +289,6 @@
                                             </div>
                                         </div>
 
-
                                         <span th:if="${campaign.status!='created'}">* The map first view is centered over the highest peak in the campaign.</span>
                                     </div>
 
@@ -444,8 +439,11 @@
     //this comment is for thymleaf to know where to inject the data
     /*[+
     var peaksString = [[${listaPeaks}]];
+    var focusPeakString= [[${focusPeak}]];
      +]*/
     var marker;
+
+    console.log("peakTOFOCUS", focusPeakString)
 
     //MAP 2D configurations
     //define the icon colors
@@ -492,7 +490,15 @@
 
     peaks = JSON.parse(peaksString);
 
-    var mymap = L.map('mapid').setView([peaks[0].latitude, peaks[0].longitude], 13);
+    //to set the focus to a specific peak in the 2D MAP
+    var focusPeak;
+    if (focusPeakString==null){
+        focusPeak={latitude:peaks[0].latitude, longitude: peaks[0].longitude, altitude:  peaks[0].altitude};
+    }else{
+        focusPeak = JSON.parse(focusPeakString);
+    }
+
+    var mymap = L.map('mapid').setView([focusPeak.latitude, focusPeak.longitude], 13);
 
     //function to modify right panel
     function onClickOverMarker(peakLocalId) {
@@ -590,23 +596,7 @@
     });
 
     viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-popups allow-forms allow-scripts allow-top-navigation');
-    viewer.infoBox.frame.addEventListener('load', function () {
-        //
-        // Now that the description is loaded, register a click listener inside
-        // the document of the iframe.
-        //
-        viewer.infoBox.frame.contentDocument.body.addEventListener('click', function (e) {
-            //
-            // The document body will be rewritten when the selectedEntity changes,
-            // but this body listener will survive.  Now it must determine if it was
-            // one of the clickable buttons.
-            //
-            if (e.target && e.target.className === 'btn btn-default btn-sm') {
-                console.log(e);
-                // window.location.replace("http://www.google.com");
-            }
-        }, false);
-    }, false);
+
     for (var i = 0; i < peaks.length; i++) {
         viewer.entities.add({
             position: Cesium.Cartesian3.fromDegrees(peaks[i].longitude, peaks[i].latitude, peaks[i].altitude * 3),
@@ -618,8 +608,10 @@
                 // imageSubRegion : new Cesium.BoundingRectangle(49, 43, 18, 18),
                 // color : Cesium.Color.LIME
             },
-            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button type='button' class='btn btn-default btn-sm'" +
-            "onclick=\"window.location.href='/peaks/" + peaks[i].id + "'\">" +
+            description: "Altitude: " + peaks[i].altitude + "m.<br></br> <button hidden='true' type='button' class='btn btn-default btn-sm'" +
+            // "onclick=\"window.location.href='/peaks/" + peaks[i].id
+            + "'\">" +
+            //     "onclick='onClickOverMarker(" + i +")'" +
             "Details </button>",
             name: "Peak " + peaks[i].name,
             id: "label_" + i
@@ -630,30 +622,23 @@
     handler.setInputAction(function (movement) {
         var pick = viewer.scene.pick(movement.position);
         if (Cesium.defined(pick)) {
-            var markerObjectId = pick.customId;
-            var idString = pick.id;
-            console.log(idString);
-            viewer.infoBox.viewModel.showInfo = false;
-            viewer.infoBox.viewModel.closeClicked.addEventListener(function () {
-                onClickOverMarker(markerObjectId)
-            });
+            var idString =pick.id._id.substr(6)
+            console.log("pw", idString);
+            onClickOverMarker(idString)
+            // viewer.infoBox.viewModel.showInfo = false;
+            // viewer.infoBox.viewModel.closeClicked.addEventListener(function () {
+            //     onClickOverMarker(markerObjectId)
+            // });
         }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
     viewer.camera.setView({
-        destination: new Cesium.Cartesian3.fromDegrees(peaks[0].longitude, peaks[0].latitude, peaks[0].altitude * 3),
+        destination: new Cesium.Cartesian3.fromDegrees(focusPeak.longitude, focusPeak.latitude, focusPeak.altitude * 3),
         // orientation : {
         //     heading : 4.731089976107251,
         //     pitch : -0.32003481981370063
         // }
     });
-
-    var toolbar = document.getElementById('toolbar');
-
-    function updateDisplay(stringToUpdate) {
-        toolbar.innerHTML = 'Number of times you clicked either button:';
-    }
-
 
     /*]]>*/
 
