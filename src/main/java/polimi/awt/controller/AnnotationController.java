@@ -52,15 +52,18 @@ public class AnnotationController {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
-        Annotation ann = annotationLogic.findAnnotationById(annotationId);
-        modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
+        Annotation ann = null;
         try {
+            //Look for the annotation if it is exist
+            ann = annotationLogic.findAnnotationById(annotationId);
+            modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
             //reject annotation
             annotationLogic.rejectAnnotation(annotationId);
             message = new Message("Success", "The annotation has been rejected successfully.");
             model.addAttribute("message", message);
         } catch (Exception e) {
             e.printStackTrace();
+            modelAndView.setViewName("redirect:home");
             message = new Message("Warning", "There was a problem rejecting the campaign with ID=" + ann.getId() + "." + e.getMessage() + ". ");
             model.addAttribute("message", message);
         }
@@ -76,15 +79,17 @@ public class AnnotationController {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
-        Annotation ann = annotationLogic.findAnnotationById(annotationId);
-        modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
+        Annotation ann = null;
         try {
+            ann = annotationLogic.findAnnotationById(annotationId);
+            modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
             //accept annotation
             annotationLogic.acceptAnnotation(annotationId);
             message = new Message("Success", "The annotation has been accepted successfully.");
             model.addAttribute("message", message);
         } catch (Exception e) {
             e.printStackTrace();
+            modelAndView.setViewName("redirect:home");
             message = new Message("Warning", "There was a problem accepting the campaign with ID=" + ann.getId() + "." + e.getMessage() + ". ");
             model.addAttribute("message", message);
         }
@@ -140,21 +145,22 @@ public class AnnotationController {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
-
-        Peak peakToAnnotate = peakLogic.findPeakById(peakId);
-
+        Peak peakToAnnotate = null;
         try {
+            peakToAnnotate = peakLogic.findPeakById(peakId);
             annotationLogic.createAnnotation(annotation, peakId);
             message = new Message("Success", "Annotation created successfully");
             model.addAttribute("message", message);
+
+            //redirect to campaign focusing on the peak annotated
+            modelAndView.setViewName("redirect:campaign/"+ peakToAnnotate.getCampaign().getId());
         } catch (Exception e) {
             e.printStackTrace();
             message = new Message("Warning", e.getMessage());
             model.addAttribute("message", message);
+            //redirect to campaign focusing on the peak annotated
+            modelAndView.setViewName("redirect:home");
         }
-
-        //redirect to campaign focusing on the peak annotated
-        modelAndView.setViewName("redirect:campaign/"+ peakToAnnotate.getCampaign().getId());
 
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String jsonPeak = gson.toJson(peakToAnnotate);
