@@ -33,7 +33,7 @@ public class FileSystemStorageService implements StorageService {
             if (Files.exists( this.rootLocation.resolve(fileName))){
                 Files.delete(this.rootLocation.resolve(fileName));
             }
-            //Se copia el archivo subido a la carpeta upload en la raiz del proyecto
+            //The file is copied to the project root
             Files.copy(file.getInputStream(), this.rootLocation.resolve(fileName));
 
 

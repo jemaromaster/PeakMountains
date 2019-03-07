@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -59,7 +61,8 @@ public class CampaignController {
             return "/myCampaigns";
         } else { //the role is a worker. Display the worker home page
 
-            List<Campaign> campaignsJoined = campaignLogic.listCampaignByWorkers(userInSession, 0, 100);
+//            List<Campaign> campaignsJoined = campaignLogic.listCampaignByWorkers(userInSession, 0, 100);
+            List<Campaign> campaignsJoined = campaignLogic.listCampaignByWorkersAndStatusEqual(userInSession,"started", 0, 100);
             model.addAttribute("campaignsJoined", campaignsJoined);
 
             Set<UserPV> set = new HashSet();
@@ -72,9 +75,8 @@ public class CampaignController {
 
     }
 
-    //campaign list
     @GetMapping("/campaign/{campaignId}")
-    public String getCampaigns(@PathVariable Long campaignId, Model model) {
+    public ModelAndView getCampaigns(@PathVariable Long campaignId, Model model, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
         Campaign campaign = campaignLogic.findCampaignById(campaignId);
         Page<Peak> listaPeaks = peakLogic.findPeakByCampaign(campaignId, 0, 1000);
         model.addAttribute("campaign", campaign);
@@ -90,10 +92,14 @@ public class CampaignController {
             model.addAttribute("subscribedTo", null);
         }
 
+        //in order to return a JSON we use a json builder
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         String jsonList = gson.toJson(list);
 
         model.addAttribute("listaPeaks", jsonList);
+
+        //in order to redirect to a previous page, and add a message
+        ModelAndView modelAndView = new ModelAndView();
 
         if (rolUserInSession.equals("worker")) {
             // for worker profile
@@ -104,9 +110,26 @@ public class CampaignController {
                 Message message = new Message("Warning", "You are not subscribed to this campaign. To start adding annotations, you must subscribe to it first!");
                 model.addAttribute("message", message);
             }
-            return "/campaignDetailsWorker";
-        } else
-            return "/campaignDetails";
+
+            if (!campaign.getStatus().equals("started")){ //a worker can visualize started campaigns details only
+                Message message = new Message("Warning", "The campaign named " + campaign.getName()+ " you are trying to access is in " + campaign.getStatus().trim() + " mode. You can only access to started campaigns.");
+                modelAndView.setViewName("redirect:" + httpServletRequest.getContextPath() + "/home");
+                redirectAttributes.addFlashAttribute("message", message);
+            }else{ //it is in started mode
+                modelAndView.setViewName("/campaignDetailsWorker");
+            }
+
+        } else { //it is a manager
+            if (campaign.getUsrManager().getId() != userInSession.getId()) {
+                redirectAttributes.addFlashAttribute("message", new Message("Warning",
+                        "Only the campaign manager can access to the administrative information of the campaign with ID: " + campaign.getId() + ". "));
+                modelAndView.setViewName("redirect:/home");
+            } else { //it is authorized
+                modelAndView.setViewName("/campaignDetails");
+            }
+
+        }
+        return modelAndView;
     }
 
 
@@ -116,9 +139,18 @@ public class CampaignController {
     }
 
     @GetMapping("/campaign/new")
-    public String createCampaign(Model model) {
-        model.addAttribute("campaign", new Campaign());
-        return "/newCampaign";
+    public ModelAndView createCampaign(Model model, RedirectAttributes redir, HttpServletRequest httpServletRequest) {
+        String rolInSession = utils.getRolUserInSession();
+        ModelAndView modelAndView = new ModelAndView();
+
+        if (rolInSession.equals("manager")) {
+            model.addAttribute("campaign", new Campaign());
+            modelAndView.setViewName("/newCampaign");
+        } else {
+            modelAndView.setViewName("redirect:" + httpServletRequest.getContextPath() + "/home");
+            redir.addFlashAttribute("message", new Message("Warning", "You do not have manager privileges."));
+        }
+        return modelAndView;
     }
 
     @PostMapping("/campaign/new")
@@ -128,11 +160,12 @@ public class CampaignController {
         try {
             campaignLogic.createCampaign(campaign);
             message = new Message("Success", "The new campaign created successfully.");
-            model.addAttribute("message", message);
+        } catch (AccessDeniedException e) {
+            e.printStackTrace();
+            message = new Message("Warning", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             message = new Message("Warning", "There was a problem creating the campaign.");
-            model.addAttribute("message", message);
         }
 
         //in order to redirect to a previous page, and add a message
@@ -172,6 +205,10 @@ public class CampaignController {
             redirectAttributes.addFlashAttribute("message", new Message("Warning", "Only the campaign manager can visualize the statistics in a campaign"));
             modelAndView.setViewName("redirect:/home");
             return modelAndView;
+        }else if(campaign.getStatus().equals("created")){
+            redirectAttributes.addFlashAttribute("message", new Message("Warning", "You can only check statistics of STARTED and CLOSED campaigns"));
+            modelAndView.setViewName("redirect:/home");
+            return modelAndView;
         }
 
         Statistics stat = campaignLogic.getStatistics(campaign);
@@ -199,8 +236,8 @@ public class CampaignController {
                                              RedirectAttributes redirectAttributes) {
         Message message = null;
         try {
-            campaignLogic.StoreAndProcessFile(file, campaignId, toAnnotate);
-            message = new Message("Success", "You successfully uploaded " + file.getOriginalFilename() + "!");
+            ResponseEntity re= campaignLogic.StoreAndProcessFile(file, campaignId, toAnnotate);
+            message = new Message("Success", re.getBody().toString());
         } catch (StorageException e) {
             e.printStackTrace();
             message = new Message("Error", "Error upload file. " + e.getMessage());

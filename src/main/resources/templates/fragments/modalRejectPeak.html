@@ -87,7 +87,9 @@
             <form th:action="@{~/annotations/{annId}/reject(annId=${annotationSelected.id})}"
                   th:if="${annotationSelected.status.equals('VALID')}" method="post">
                 <button type="submit"
-                        class="btn btn-danger btn-sm">
+                        class="btn btn-danger btn-sm"
+                        th:disabled="${!annotationSelected.campaign.status.equals('started')}"
+                >
                     <i class="fa fa-times"></i> Reject Annotation
                 </button>
                 <button type="button" class="btn btn-default btn-sm"
@@ -97,6 +99,7 @@
             <form th:action="@{~/annotations/{annId}/accept(annId=${annotationSelected.id})}"
                   th:if="${annotationSelected.status.equals('REJECTED')}" method="post">
                 <button type="submit" class="btn btn-success btn-sm"
+                        th:disabled="${!annotationSelected.campaign.status.equals('started')}"
                 >
                     <i class="fa fa-check"></i> Accept
                     Annotation

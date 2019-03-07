@@ -137,6 +137,15 @@ public class CampaignLogic {
         return listCampaignJoined.getContent();
     }
 
+    public List<Campaign> listCampaignByWorkersAndStatusEqual(UserPV worker, String status, Integer page, Integer size) {
+        ArrayList<UserPV> listaWorkers = new ArrayList<UserPV>();
+        listaWorkers.add(worker);
+        Page<Campaign> listCampaignJoined = campaignRepository.findCampaignByWorkersJoinedAndStatusEqualsOrderById(listaWorkers, status, new PageRequest(page, size));
+
+        return listCampaignJoined.getContent();
+    }
+
+
     public Page<Campaign> listCampaignByWorkersJoinedIsNotAndStatusEquals(Set<UserPV> workerSet, String status, Integer page, Integer size) {
         Page<Campaign> listCamp = campaignRepository.findCampaignsByStatusEqualsAndWorkersJoinedIsNotContaining(status, workerSet, new PageRequest(page, size));
         return listCamp;
@@ -161,7 +170,7 @@ public class CampaignLogic {
         }
 
         if (campaignToUploadFile.getStatus().equals("created")) {
-            throw new RuntimeException("The campaign should be in STATUS:STARTED to upload a file. Please start the campaign first.");
+            throw new RuntimeException("The campaign should be in STATUS: STARTED to upload a file. Please start the campaign first.");
         } else if (!campaignToUploadFile.getStatus().equals("started")) {
             throw new RuntimeException("The campaign should be in STATUS:STARTED to upload a file.");
         }
@@ -177,8 +186,9 @@ public class CampaignLogic {
 
         //process the file
         Path pathToFile = storageService.load(fileName);
+        Integer counterFailedRows = 0;
         try {
-            this.parseJsonFileAndSave(pathToFile, campaignToUploadFile, toAnnotate);
+            counterFailedRows = this.parseJsonFileAndSave(pathToFile, campaignToUploadFile, toAnnotate);
         } catch (org.json.simple.parser.ParseException e) {
             e.printStackTrace();
             return new ResponseEntity("Error parsing json file!", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -190,16 +200,23 @@ public class CampaignLogic {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity("File uploaded and processed successfully!", HttpStatus.OK);
+        String msg = null;
+        if (counterFailedRows > 0) {
+            msg = "File " + file.getOriginalFilename() + " uploaded and processed partially! Failed rows = " + counterFailedRows;
+        } else {
+            msg = "File " + file.getOriginalFilename() + " uploaded and processed successfully!";
+        }
+        return new ResponseEntity(msg, HttpStatus.OK);
     }
 
-    private void parseJsonFileAndSave(Path pathToFile, Campaign campaign, Boolean toAnnotate) throws Exception {
+    private Integer parseJsonFileAndSave(Path pathToFile, Campaign campaign, Boolean toAnnotate) throws Exception {
         JSONParser parser = new JSONParser();
 
         //Use JSONObject for simple JSON and JSONArray for array of JSON.
         JSONArray dataArray = (JSONArray) parser.parse(new FileReader(pathToFile.toString()));
 
         Peak peak;
+        Integer failedRows = 0;
         for (Object o : dataArray) {
             peak = new Peak();
             JSONObject peakJSON = (JSONObject) o;
@@ -209,6 +226,12 @@ public class CampaignLogic {
             Double latitude = (Double) peakJSON.get("latitude");
             Double longitude = (Double) peakJSON.get("longitude");
             String provenance = (String) peakJSON.get("provenance");
+
+            //in case the file contain null fields in the previous names
+            if (name == null || elevation == null || latitude == null || longitude == null || provenance == null) {
+                failedRows++;
+                continue;
+            }
 
             peak.setName(name);
             peak.setAltitude(elevation);
@@ -245,8 +268,9 @@ public class CampaignLogic {
 
             peakRepository.save(peak);
             alternativePeakNameRepository.save(peak.getLocalizedNames());
-        }
 
+        }
+        return failedRows;
     }
 
     public Campaign startCampaign(Long campaignId) {
@@ -314,11 +338,12 @@ public class CampaignLogic {
         return campaignToSuscribe;
     }
 
-    public Boolean isWorkerSubscribedToCampaign(Campaign campaign, UserPV worker){
+    public Boolean isWorkerSubscribedToCampaign(Campaign campaign, UserPV worker) {
         HashSet<UserPV> hs = new HashSet<>();
         hs.add(worker);
         return campaignRepository.existsCampaignsByWorkersJoinedContainingAndIdEquals(hs, campaign.getId());
     }
+
     public Statistics getStatistics(Campaign campaign) {
         //we get the user from the session
         Statistics stat = new Statistics();

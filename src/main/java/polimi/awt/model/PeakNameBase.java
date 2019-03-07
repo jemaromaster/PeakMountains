@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import javax.persistence.*;
 
 //Class to store the alternative name (different languages) of a Peak
-// clase qeus e utiliza para base en AlternativePeak...  que son alternativas de nombres y anotaciones para PEAKS
+//
 @MappedSuperclass
 public class PeakNameBase {
 

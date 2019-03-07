@@ -17,8 +17,10 @@ public interface CampaignRepository extends PagingAndSortingRepository<Campaign,
     Campaign findCampaignById(Long id);
     Page<Campaign> findCampaignByUsrManager(UserPV manager, Pageable pageable);
     Page<Campaign> findCampaignByWorkersJoinedOrderById(List<UserPV> workers , Pageable pageable);
+    Page<Campaign> findCampaignByWorkersJoinedAndStatusEqualsOrderById(List<UserPV> workers ,String status, Pageable pageable);
     Boolean existsCampaignsByWorkersJoinedContainingAndIdEquals(Set<UserPV> userNotContaining, Long id);
 
+//    Example how to do a customized query
 //    @Query("SELECT c FROM Campaign c JOIN FETCH Annotation a ON a.campaign.id = c.id WHERE a.id = (:id)")
 //    Campaign findCampaignByAnnotationId(@Param("id") Long idAnnotation);
 }

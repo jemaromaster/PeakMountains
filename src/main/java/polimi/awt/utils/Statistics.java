@@ -2,6 +2,7 @@ package polimi.awt.utils;
 
 import java.math.BigDecimal;
 
+//class in order to display statistics results in page
 public class Statistics {
 
     private BigDecimal totalPeaks = new BigDecimal(0);

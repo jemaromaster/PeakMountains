@@ -28,39 +28,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
-	/*@Autowired
-	public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("bill").password("abc123").roles("ADMIN");
-		auth.inMemoryAuthentication().withUser("tom").password("abc123").roles("USER");
-	}*/
-	
-	/*@Override
-	protected void configure(HttpSecurity http) throws Exception {
- 
-	  http
-	  	.authorizeRequests()
-	  	.antMatchers("/**").hasRole("ADMIN")
-		.and().httpBasic().realmName(REALM).authenticationEntryPoint(getBasicAuthEntryPoint());
- 	}*/
-
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
 
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/vendors/**","/images/**","/css/**","/build/**","/register","/error/**","/403","/error").permitAll()
-                .antMatchers("/admin/**").hasAnyRole("ADMIN")
-                .antMatchers("/user/**").hasAnyRole("USER")
-                .anyRequest().authenticated()
+                    .antMatchers("/", "/vendors/**","/images/**","/css/**","/build/**","/register","/error/**","/403","/error").permitAll()
+                    .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                .permitAll()
+                    .loginPage("/login").permitAll()
                 .and()
-                .logout()
-                .permitAll()
+                    .logout().permitAll()
                 .and()
-                .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+                    .exceptionHandling().accessDeniedHandler(accessDeniedHandler);
 
     }
 
@@ -86,11 +67,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint() {
         return new CustomBasicAuthenticationEntryPoint();
     }
-
-	/*@Bean
-	public CustomBasicAuthenticationEntryPoint getBasicAuthEntryPoint(){
-		return new CustomBasicAuthenticationEntryPoint();
-	}*/
 
     @Override
     public void configure(WebSecurity web) throws Exception {

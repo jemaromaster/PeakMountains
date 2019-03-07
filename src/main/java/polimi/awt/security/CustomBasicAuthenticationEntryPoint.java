@@ -1,7 +1,7 @@
 package polimi.awt.security;
 
 /**
- * Created by pablo on 19/05/17.
+ *
  */
 
 import org.springframework.security.core.AuthenticationException;

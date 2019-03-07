@@ -72,7 +72,7 @@ public class AnnotationLogic {
             throw new RuntimeException("Peak with id " + peakId + " is not able for annotation");
         }
 
-        if (this.isAnnotatedByUser(peak, userFromSession)){
+        if (this.isAnnotatedByUser(peak, userFromSession)) {
             throw new RuntimeException("You have already annotated this peak. A peak can be annotated only once per user.");
         }
 
@@ -96,8 +96,9 @@ public class AnnotationLogic {
 //                check for annotation, if they are empty
                 if (an.getName() != null) {
                     an.setAnnotation(annotationToReturn);
-                    if (an.getName() != null && an.getName().trim().equals(""))break; else
-                    an.setName(an.getName().trim());
+                    if (an.getName() != null && an.getName().trim().equals("")) break;
+                    else
+                        an.setName(an.getName().trim());
                     if (an.getLang() != null && an.getLang().trim().equals("")) break;
                     else an.setLang(an.getLang().trim());
                     nameForAnnotationRepository.save(an);
@@ -106,9 +107,9 @@ public class AnnotationLogic {
         }
 
         //maintain color
-        if (peak.getColor().equals("yellow") || peak.getColor().equals("orange")){ //the first one or after the first one
+        if (peak.getColor().equals("yellow") || peak.getColor().equals("orange")) { //the first one or after the first one
             peak.setColor("orange");
-        }else if(peak.getColor().equals("red")){ //it has one reject annotation
+        } else if (peak.getColor().equals("red")) { //it has one reject annotation
             peak.setColor("red");
         }
 
@@ -145,6 +146,11 @@ public class AnnotationLogic {
             throw new RuntimeException("The annotation has already been rejected");
         }
 
+        if (!camp.getStatus().equals("started")) {
+            throw new RuntimeException("The annotation cannot be reject since the campaign is in mode: " + camp.getStatus() +
+            ". Only annotations can be rejected in STARTED mode.");
+        }
+
         annotationToReject.setStatus("REJECTED");
 
         if (peak.getColor().equals("orange")) {
@@ -172,6 +178,11 @@ public class AnnotationLogic {
 
         if (annotationToReject.getStatus().equals("VALID")) {
             throw new RuntimeException("The annotation has already been reaccepted");
+        }
+
+        if (!camp.getStatus().equals("started")) {
+            throw new RuntimeException("The annotation cannot be reject since the campaign is in mode: " + camp.getStatus() +
+            ". Only annotations can be accepted in STARTED mode.");
         }
 
         annotationToReject.setStatus("VALID");
@@ -213,7 +224,7 @@ public class AnnotationLogic {
     }
 
     public List<Annotation> findAnnotationByPeakAndUser(Peak peak, UserPV userPV) {
-        return annotationRepository.findAnnotationByPeakAndUserPV(peak,userPV);
+        return annotationRepository.findAnnotationByPeakAndUserPV(peak, userPV);
     }
 
     public Annotation createAnnotationByPeak(Peak peak, UserPV userPV) {
@@ -227,9 +238,9 @@ public class AnnotationLogic {
         return annotationRepository.findAnnotationById(findById);
     }
 
-    public Boolean isAnnotatedByUser(Peak peak, UserPV user){
-        List<Annotation> p = annotationRepository.findAnnotationByPeakAndUserPV(peak,user);
-        return p.size()>0;
+    public Boolean isAnnotatedByUser(Peak peak, UserPV user) {
+        List<Annotation> p = annotationRepository.findAnnotationByPeakAndUserPV(peak, user);
+        return p.size() > 0;
     }
 
 

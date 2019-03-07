@@ -18,6 +18,7 @@ import polimi.awt.model.Peak;
 import polimi.awt.model.UserPV;
 import polimi.awt.utils.Message;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -48,7 +49,7 @@ public class AnnotationController {
     }
 
     @PostMapping("/annotations/{annotationId}/reject")
-    public ModelAndView rejectAnnotation(@PathVariable Long annotationId, Model model, RedirectAttributes redir) {
+    public ModelAndView rejectAnnotation(@PathVariable Long annotationId, Model model, HttpServletRequest httpServletRequest, RedirectAttributes redir) {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
@@ -57,14 +58,15 @@ public class AnnotationController {
             //Look for the annotation if it is exist
             ann = annotationLogic.findAnnotationById(annotationId);
             modelAndView.setViewName("redirect:/peaks/" + ann.getPeak().getId());
+
             //reject annotation
             annotationLogic.rejectAnnotation(annotationId);
             message = new Message("Success", "The annotation has been rejected successfully.");
             model.addAttribute("message", message);
         } catch (Exception e) {
             e.printStackTrace();
-            modelAndView.setViewName("redirect:home");
-            message = new Message("Warning", "There was a problem rejecting the campaign with ID=" + ann.getId() + "." + e.getMessage() + ". ");
+            modelAndView.setViewName("redirect:" + httpServletRequest.getContextPath() + "/home");
+            message = new Message("Warning", "Campaign with ID=" + ann.getId() + "." + e.getMessage());
             model.addAttribute("message", message);
         }
 
@@ -75,7 +77,7 @@ public class AnnotationController {
 
     //annotation details
     @PostMapping("/annotations/{annotationId}/accept")
-    public ModelAndView acceptAnnotation(@PathVariable Long annotationId, Model model, RedirectAttributes redir) {
+    public ModelAndView acceptAnnotation(@PathVariable Long annotationId, Model model, HttpServletRequest httpServletRequest, RedirectAttributes redir) {
 
         Message message = null;
         ModelAndView modelAndView = new ModelAndView();
@@ -89,8 +91,8 @@ public class AnnotationController {
             model.addAttribute("message", message);
         } catch (Exception e) {
             e.printStackTrace();
-            modelAndView.setViewName("redirect:home");
-            message = new Message("Warning", "There was a problem accepting the campaign with ID=" + ann.getId() + "." + e.getMessage() + ". ");
+            modelAndView.setViewName("redirect:" + httpServletRequest.getContextPath() + "/home");
+            message = new Message("Warning", "There was a problem accepting the campaign with ID=" + ann.getId() + "." + e.getMessage());
             model.addAttribute("message", message);
         }
 
@@ -133,6 +135,12 @@ public class AnnotationController {
                 redir.addFlashAttribute("message", message);
                 return "redirect:/home";
             }
+        }else{ //it is a manager it cannot annotate a peak
+            model.addAttribute("isSuscribedToCampaign", false);
+            Message message = new Message("Warning", "You do not have worker privilege "+
+                    ". Only workers can annotate peaks!");
+            redir.addFlashAttribute("message", message);
+            return "redirect:/home";
         }
 
         return "/peakEdit";

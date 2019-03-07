@@ -1,19 +1,16 @@
-When creating the WORKER use case:
-- maintain the annotation number columns in the Peak entity: anytime that there's a new annotation, a conflict should be check,
-  update the peak validity counters.
+For deploying the environment
+- Java 1.8
+- Postgres 9.0 (or change the JDBC version in pom.xml)
+    - There is an script called 'import.sql' that should be automatically execute when creating the database.
 
-Still lacking:
-- MAP 3D.
-- Worker use cases:
-    - subscribe to campaigns.
-    - list campaign.
-    - create annotation in peaks.
-- Profile for modifying user information.
+Technologies used:
+- thymeleaf v 1.5
+- SpringBoot
+    - spring security (if you don't want to use the security, go to application.properties and set it to FALSE)
+    - spring storage
 
-If we have time:
-- pagination in tables.
-- set specific messages to forms.
-- pagination in map.
+- Template HTML/Bootstrap used : Gentella Allela. https://colorlib.com/polygon/gentelella/index.html
 
-$2a$11$I/8vhuYXeIlHerg4ef3q4egPnvfGdVNGHdr.PLSvIDc7SbGs.Oa7O
-
+Author:
+Jesus Romero jemaromaster@gmail.com
+Nicolas Falconi
