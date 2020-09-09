@@ -1,9 +1,9 @@
 ## Crowdsourcing Mountain Identification webapp. 
 
-- The system allows two types of users (campaign admins, annotators). 
-- Admins are allow to create campaigns and upload peaks registry files. 
+- The system allows two types of user profiles (campaign admins, annotators). 
+- Admins are allow to create mountain campaigns and upload peaks registry files (check example in code). 
 - Annotators can confirm the information of each peak and suggest edition to these. 
-- Admins have a dashboard where they can filter information about their campaigns.
+- Admins have a /dashboard where they can filter information about their campaigns.
 
 ### Techonologies
 - Deploying environment
